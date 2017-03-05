@@ -1,6 +1,7 @@
 import os
 import requests
 import time
+import urllib2
 
 from csv import DictReader, DictWriter
 
@@ -13,11 +14,13 @@ class Fetcher(object):
       download_url='',
       state='',
       data_type='',
+      file_type='',
       retry_attempts=2):
 
     self.download_url = download_url
     self.state = state
     self.data_type = data_type
+    self.file_type = file_type
     self.retry_attempts = retry_attempts
 
     self.setup_file()
@@ -53,6 +56,26 @@ class Fetcher(object):
 
       print 'Finished with %d bad lines' % self.error_counter
 
+  def download_data_ftp(self):
+    if not self.retry_attempts or not self.download_url or not self.file_path:
+      return
+
+    print 'Writing %s' % self.file_path
+    with open(self.file_path, 'w+') as file_handle:
+      try:
+        print 'Fetching %s' % self.download_url
+        self.retry_attempts -= 1
+
+        request = urllib2.Request(self.download_url)
+        self.download_response = urllib2.urlopen(request)
+        file_handle.write(self.download_response.read())
+
+      except Exception, e:
+        print 'Error downloading %s: %s' % (self.download_url, e)
+        if self.retry_attempts:
+          print 'Retrying %d more times' % self.retry_attempts
+          self.download_data_ftp()
+
   def setup_file(self):
     state_directory = os.path.join(DATA_DIRECTORY, self.state)
     if not os.path.isdir(state_directory):
@@ -62,4 +85,4 @@ class Fetcher(object):
     if not os.path.isdir(type_directory):
       os.mkdir(type_directory)
 
-    self.file_path = os.path.join(type_directory, '%d.csv' % int(time.time()))
+    self.file_path = os.path.join(type_directory, '%d.%s' % (int(time.time()), self.file_type))

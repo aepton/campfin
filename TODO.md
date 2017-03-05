@@ -1,5 +1,5 @@
 * Write full end-to-end script:
-  * Fetch upstream data
+  * ~~Fetch upstream data~~
     * ~~Use shared class for fetching logic~~
   * Process it
     * Generate CSVs

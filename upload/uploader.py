@@ -4,12 +4,16 @@ import os
 import requests
 import urllib
 
+from transform.ocd import *
+
 from csv import DictReader, DictWriter
-from ocd import *
 from sodapy import Socrata
 
-PARENT_DIRECTORY = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-DATA_DIRECTORY = os.path.join(PARENT_DIRECTORY, 'ocd_campaign_finance')
+ROOT_DIRECTORY = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+DATA_DIRECTORY = os.path.join(ROOT_DIRECTORY, 'data')
+OCD_DIRECTORY = os.path.join(DATA_DIRECTORY, 'OCD')
+
+ENABLED_STATES = ['WA']
 
 def get_socrata_auth(
     lastpass_domain=os.environ['LASTPASS_DOMAIN'],
@@ -24,14 +28,16 @@ def get_socrata_auth(
   }
 
 def update_dataset_registry(dataset_id, state, year):
-  with open('dataset_registry.csv', 'a') as FH:
-    writer = DictWriter(FH, ['dataset_id', 'state', 'year'])
-    writer.writerow({'dataset_id': dataset_id, 'state': state, 'year': year})
+  path = os.path.join(DATA_DIRECTORY, 'dataset_registry.csv')
+  with open(path, 'a') as FH:
+    writer = DictWriter(FH, ['dataset_id', 'state'])
+    writer.writerow({'dataset_id': dataset_id, 'state': state})
 
 def upload_file(state, auth):
   auth = get_socrata_auth()
 
-  path = os.path.join(DATA_DIRECTORY, state)
+  file_name = '%s.csv' % state
+  path = os.path.join(OCD_DIRECTORY, '%s.csv' % state)
   files = {
     'file': open(path)
   }
@@ -41,7 +47,7 @@ def upload_file(state, auth):
   }
 
   r = requests.post(
-    'https://abrahamepton.demo.socrata.com/imports2?method=scan',
+    'https://abrahamepton.demo.socrata.com/imports2?method=scan&nbe=true',
     auth=(auth['username'], auth['password']),
     files=files,
     headers=headers)
@@ -49,16 +55,13 @@ def upload_file(state, auth):
   try:
     file_id = r.json()['fileId']
   except:
-    print 'Error scanning file for %s-%d: %s' % (state, year, r.text)
+    print 'Error scanning file for %s: %s' % (state, r.text)
     return
-
-  file_name = '%s_%d.csv' % (state, year)
-  pretty_file_name = '%s %d' % (state, year)
 
   print 'Posted file, got fileId %s' % file_id
 
   r = requests.post(
-    'https://abrahamepton.demo.socrata.com/imports2.json',
+    'https://abrahamepton.demo.socrata.com/imports2.json?ingress_strategy=nbe&nbe=true',
     auth=(auth['username'], auth['password']),
     headers=headers,
     data={
@@ -67,7 +70,7 @@ def upload_file(state, auth):
       'blueprint': json.dumps({
         'columns': TRANSACTION_BLUEPRINT_COLS,
         'skip': 1,
-        'name': pretty_file_name
+        'name': file_name
       })
     })
 
@@ -84,24 +87,16 @@ def upload_file(state, auth):
     password=auth['password'])
 
   try:
-    client.update_metadata(r.json()['id'], {'tags': [state, str(year)]})
+    client.update_metadata(r.json()['id'], {'tags': [state]})
     client.publish(r.json()['id'])
     client.set_permission(r.json()['id'], 'public')
   except Exception, e:
     pass
 
-  update_dataset_registry(r.json()['id'], state, year)
+  update_dataset_registry(r.json()['id'], state)
 
 if __name__ == '__main__':
-  #auth = get_socrata_auth()
-  current_dir = os.path.dirname(os.path.realpath(__file__))
-  for state in os.listdir(os.path.join(current_dir, 'data', 'OCD')):
-    for file in os.listdir(os.path.join(current_dir, 'data', 'OCD', state)):
-      if file.endswith('.csv'):
-        try:
-          year = int(file.replace('.csv', ''))
-        except Exception, e:
-          print 'No way to cast year %s as int: %s' % (file, e)
-          continue
-        print 'Uploading %s %d' % (state)
-        #upload_file('WA', auth)
+  auth = get_socrata_auth()
+  for state in ENABLED_STATES:
+    print 'Uploading %s' % (state)
+    upload_file(state, auth)

@@ -72,7 +72,7 @@ TRANSACTION_COLUMNS = [
   },
   {
     'name': 'Sender (location)',
-    'datatype': 'location',
+    'datatype': 'text',
     'csv_name': 'sender__person__location'
   },
   {

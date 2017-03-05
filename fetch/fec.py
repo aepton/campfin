@@ -3,14 +3,16 @@ import zipfile
 from fetcher import *
 
 STATE = 'FEC'
+YEAR = '2016'
+CYCLE = YEAR[2:]
 DATA_URLS = {
-  'candidate_committee_link': 'ftp://ftp.fec.gov/FEC/2016/ccl16.zip',
-  'candidate_master': 'ftp://ftp.fec.gov/FEC/2016/cn16.zip',
-  'committee_master': 'ftp://ftp.fec.gov/FEC/2016/cm16.zip',
-  'committee_to_committee': 'ftp://ftp.fec.gov/FEC/2016/oth16.zip',
-  'committee_to_candidate': 'ftp://ftp.fec.gov/FEC/2016/pas216.zip',
-  'expenditures': 'ftp://ftp.fec.gov/FEC/2016/oppexp16.zip',
-  'contributions': 'ftp://ftp.fec.gov/FEC/2016/indiv16.zip'
+  'candidate_committee_link': 'ftp://ftp.fec.gov/FEC/%s/ccl%s.zip' % (YEAR, CYCLE),
+  'candidate_master': 'ftp://ftp.fec.gov/FEC/%s/cn%s.zip' % (YEAR, CYCLE),
+  'committee_master': 'ftp://ftp.fec.gov/FEC/%s/cm%s.zip' % (YEAR, CYCLE),
+  'committee_to_committee': 'ftp://ftp.fec.gov/FEC/%s/oth%s.zip' % (YEAR, CYCLE),
+  'committee_to_candidate': 'ftp://ftp.fec.gov/FEC/%s/pas2%s.zip' % (YEAR, CYCLE),
+  'expenditures': 'ftp://ftp.fec.gov/FEC/%s/oppexp%s.zip' % (YEAR, CYCLE),
+  'contributions': 'ftp://ftp.fec.gov/FEC/%s/indiv%s.zip' % (YEAR, CYCLE)
 }
 
 HEADER_URLS = {
@@ -46,3 +48,4 @@ def download_data(download_headers=False):
 
 if __name__ == '__main__':
   download_data(download_headers=True)
+  print 'Create LATEST_%s file pointing to most recent data for each year in each folder' % YEAR

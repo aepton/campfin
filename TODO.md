@@ -1,13 +1,19 @@
-* Write full end-to-end script:
+* ~~Write full end-to-end script:~~
   * ~~Fetch upstream data~~
     * ~~Use shared class for fetching logic~~
   * ~~Process it~~
     * ~~Generate CSVs~~
-  * Upload to Socrata
-* Make sure WA data's uploaded to Socrata
+  * ~~Upload to Socrata~~
+* ~~Make sure WA data's uploaded to Socrata~~
 * ~~Make sure all campfin code's on github~~
 * Get running on lightsail instance
+* Uploader should upsert
+  * Check dataset registry to see if table already exists
+    * If yes, upsert; if no, upload
 * Add non-privileged user for uploading to Socrata on lightsail
 * Get demo of explorer in hello-react working with the NBE dataset
-* Try turning on data lens for new table
-* Add real logging and task orchestration with celery and flower
+* ~~Try turning on data lens for new table~~
+* Add real logging
+* Add task orchestration with celery and flower
+* Add multiple years of data to FEC
+* Enable latest-data-for-year pointer files for FEC

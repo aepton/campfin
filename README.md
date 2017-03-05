@@ -3,9 +3,15 @@ A system for fetching campaign finance data from regulators, generating Open Civ
 Implemented so far
 ==================
 
-US (FEC) - 2015/2016 contributions
+US (FEC)
+--------
+  - contributions
+    - 2015/2016
 
-WA (PDC) - 2007 - present contributions
+WA (PDC)
+--------
+ - contributions
+   - 2007 - present
 
 Folder structure:
 =================

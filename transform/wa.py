@@ -68,7 +68,7 @@ with open(CONTRIBS_FILE) as FH:
             row['contributor_zip']
           ] if e]),
         recipient__entity_type='o',
-        recipient__organization__name=row['filer_id'],
+        recipient__organization__name=row['filer_name'],
         recipient__organization__entity_id=row['filer_id'],
         recipient__organization__state='WA',
         url=row['url'].replace('View report (', '')[:-1],

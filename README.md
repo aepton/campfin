@@ -1,6 +1,13 @@
 A system for fetching campaign finance data from regulators, generating Open Civic Data Campaign Finance-compliant data files from it, and uploading them to Socrata for sharing and analysis.
 
+Implemented so far
+==================
+
+US (FEC) - 2015/2016 contributions
+WA (PDC) - 2007 - present contributions
+
 Folder structure:
+=================
 
 data/
 -----

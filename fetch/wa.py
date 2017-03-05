@@ -5,8 +5,6 @@ DATA_URLS = {
   'contributions': 'https://data.wa.gov/api/views/kv7h-kjye/rows.csv?accessType=DOWNLOAD'
 }
 
-DATA_URLS['contributions'] = 'https://data.wa.gov/api/views/xhn7-64im/rows.csv?accessType=DOWNLOAD'
-
 def download_data(download_headers=False):
   for url in DATA_URLS:
     print 'Downloading %s' % url

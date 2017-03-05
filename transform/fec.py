@@ -13,14 +13,61 @@ locale.setlocale(locale.LC_ALL, '')
 jurisdiction = 'FEC'
 
 file_handles = {}
-parent_directory = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+ROOT_DIRECTORY = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+DATA_DIRECTORY = os.path.join(ROOT_DIRECTORY, 'data')
+FEC_DIRECTORY = os.path.join(DATA_DIRECTORY, 'FEC')
+OCD_DIRECTORY = os.path.join(DATA_DIRECTORY, 'OCD')
 
 committees = {}
 
-with open('data/%s/header_cm.txt' % jurisdiction) as FH:
-  cm_header = FH.read().strip().split('|')
+COMMITTEE_MASTER_HEADER_DIR = os.path.join(FEC_DIRECTORY, 'committee_master_header')
+COMMITTEE_MASTER_HEADER_PATH = max(
+  map(
+    lambda p: os.path.join(COMMITTEE_MASTER_HEADER_DIR, p),
+    os.listdir(COMMITTEE_MASTER_HEADER_DIR)
+  ),
+  key=os.path.getctime)
 
-with open('data/%s/cm.txt' % jurisdiction) as FH:
+COMMITTEE_MASTER_DATA_DIR = os.path.join(FEC_DIRECTORY, 'committee_master')
+COMMITTEE_MASTER_DATA_PATH = os.path.join(
+  max(
+    filter(
+      lambda f: os.path.isdir(f),
+      map(
+        lambda p: os.path.join(COMMITTEE_MASTER_DATA_DIR, p),
+        os.listdir(COMMITTEE_MASTER_DATA_DIR)
+      )
+    ),
+    key=os.path.getctime
+  ),
+  'cm.txt')
+
+CONTRIBUTIONS_HEADER_DIR = os.path.join(FEC_DIRECTORY, 'contributions_header')
+CONTRIBUTIONS_HEADER_PATH = max(
+  map(
+    lambda p: os.path.join(CONTRIBUTIONS_HEADER_DIR, p),
+    os.listdir(CONTRIBUTIONS_HEADER_DIR)
+  ),
+  key=os.path.getctime)
+
+CONTRIBUTIONS_DATA_DIR = os.path.join(FEC_DIRECTORY, 'contributions')
+CONTRIBUTIONS_DATA_PATH = os.path.join(
+  max(
+    filter(
+      lambda f: os.path.isdir(f),
+      map(
+        lambda p: os.path.join(CONTRIBUTIONS_DATA_DIR, p),
+        os.listdir(CONTRIBUTIONS_DATA_DIR)
+      )
+    ),
+    key=os.path.getctime
+  ),
+  'itcont.txt')
+
+with open(COMMITTEE_MASTER_HEADER_PATH) as FH:
+  cm_header = FH.read().strip().split(',')
+
+with open(COMMITTEE_MASTER_DATA_PATH) as FH:
   reader = DictReader(FH, cm_header, delimiter='|')
   for row in reader:
     committees[row['CMTE_ID']] = {
@@ -28,15 +75,15 @@ with open('data/%s/cm.txt' % jurisdiction) as FH:
       'state': row['CMTE_ST']
     }
 
-with open('data/%s/header_itcont.txt' % jurisdiction) as FH:
-  itcont_header = FH.read().strip().split('|')
+with open(CONTRIBUTIONS_HEADER_PATH) as FH:
+  itcont_header = FH.read().strip().split(',')
 
 in_kind_codes = ['15Z', '24Z']
 FEC_DATETIME_FORMAT = '%m%d%Y'
 
 counter = 0
 missing_rows = {}
-with open('data/%s/itcont.txt' % jurisdiction) as FH:
+with open(CONTRIBUTIONS_DATA_PATH) as FH:
   reader = DictReader(FH, itcont_header, delimiter='|')
   for row in reader:
     try:
@@ -84,12 +131,11 @@ with open('data/%s/itcont.txt' % jurisdiction) as FH:
       missing_rows[error] += 1
       continue
 
-    directory = os.path.join(parent_directory, 'ocd_campaign_finance')
-    path = os.path.join(directory, '%s.csv' % committees[row['CMTE_ID']]['state'])
+    path = os.path.join(OCD_DIRECTORY, '%s.csv' % committees[row['CMTE_ID']]['state'])
 
     if path not in file_handles:
       try:
-        os.makedirs(directory)
+        os.makedirs(OCD_DIRECTORY)
       except OSError as exception:
         if exception.errno != errno.EEXIST:
           raise

@@ -21,15 +21,16 @@ HEADER_URLS = {
 def download_data(download_headers=False):
   for url in DATA_URLS:
     print 'Downloading %s' % url
+    file_type = 'zip'
     client = Fetcher(
       download_url=DATA_URLS[url],
       state=STATE,
       data_type=url,
-      file_type='zip')
+      file_type=file_type)
     client.download_data_ftp()
 
     zip_ref = zipfile.ZipFile(client.file_path, 'r')
-    zip_dir = client.file_path[:-1 * len('.zip')]
+    zip_dir = client.file_path[:-1 * len('.%s' % file_type)]
     zip_ref.extractall(zip_dir)
     zip_ref.close()
 

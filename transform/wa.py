@@ -14,12 +14,16 @@ jurisdiction = 'WA'
 
 counter = 0
 file_handles = {}
-parent_directory = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+ROOT_DIRECTORY = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+DATA_DIRECTORY = os.path.join(ROOT_DIRECTORY, 'data')
+WA_DIRECTORY = os.path.join(DATA_DIRECTORY, 'WA')
+OCD_DIRECTORY = os.path.join(DATA_DIRECTORY, 'OCD')
 
 PDC_DATETIME_FORMAT = '%m/%d/%Y'
 
-CONTRIBS_DIRECTORY = os.path.join(parent_directory, 'data', jurisdiction, 'contributions')
-CONTRIBS_FILE = max(os.listdir(parent_directory), key=os.path.getctime)
+CONTRIBS_DIRECTORY = os.path.join(WA_DIRECTORY, 'contributions')
+CONTRIBS_FILE = os.path.join(
+  CONTRIBS_DIRECTORY, max(os.listdir(parent_directory), key=os.path.getctime))
 print 'Loading %s' % CONTRIBS_FILE
 
 missing_rows = {}
@@ -71,13 +75,11 @@ with open(CONTRIBS_FILE) as FH:
       missing_rows[error] += 1
       continue
 
-    directory = os.path.join(current_directory, 'data', 'OCD', jurisdiction)
-    path = os.path.join(
-      directory, '%d.csv' % receipt_date.year)
+    path = os.path.join(OCD_DIRECTORY, 'WA.csv')
 
     if path not in file_handles:
       try:
-        os.makedirs(directory)
+        os.makedirs(OCD_DIRECTORY)
       except OSError as exception:
         if exception.errno != errno.EEXIST:
           raise

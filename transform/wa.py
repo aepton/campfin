@@ -22,17 +22,24 @@ OCD_DIRECTORY = os.path.join(DATA_DIRECTORY, 'OCD')
 PDC_DATETIME_FORMAT = '%m/%d/%Y'
 
 CONTRIBS_DIRECTORY = os.path.join(WA_DIRECTORY, 'contributions')
-CONTRIBS_FILE = os.path.join(
-  CONTRIBS_DIRECTORY, max(os.listdir(parent_directory), key=os.path.getctime))
+CONTRIBS_FILE = max(
+  filter(
+    lambda x: x.endswith('.csv'),
+    map(
+      lambda p: os.path.join(CONTRIBS_DIRECTORY, p),
+      os.listdir(CONTRIBS_DIRECTORY)
+    )
+  ),
+  key=os.path.getctime)
 print 'Loading %s' % CONTRIBS_FILE
 
 missing_rows = {}
 with open(CONTRIBS_FILE) as FH:
   reader = DictReader(FH)
   for row in reader:
-    row_id = '%s-%s' % (row['ID'], row['Origin'])
+    row_id = '%s-%s' % (row['ID'], row['origin'])
     try:
-      receipt_date = datetime.strptime(row['Receipt date'], PDC_DATETIME_FORMAT)
+      receipt_date = datetime.strptime(row['receipt_date'], PDC_DATETIME_FORMAT)
     except Exception, e:
       error = 'receipt date error: %s' % e
       if error not in missing_rows:
@@ -46,27 +53,29 @@ with open(CONTRIBS_FILE) as FH:
         filing_action=None,
         identifier=row_id,
         classification='contribution',
-        amount__value=Decimal(row['Amount'].replace('$', '')),
+        amount__value=Decimal(row['amount'].replace('$', '')),
         amount__currency='$',
-        amount__is_inkind=True if row['Cash or in-kind'] == 'Cash' else False,
+        amount__is_inkind=True if row['cash_or_in_kind'] == 'Cash' else False,
         sender__entity_type='p',
-        sender__person__name=row['Contributor name'],
-        sender__person__employer=row['Contributor employer name'],
-        sender__person__occupation=row['Contributor occupation'],
+        sender__person__name=row['contributor_name'],
+        sender__person__employer=row['contributor_employer_name'],
+        sender__person__occupation=row['contributor_occupation'],
         sender__person__location=', '.join(
           [e for e in [
-            row['Contributor address'],
-            row['Contributor city'],
-            row['Contributor state'],
-            row['Contributor zip']
+            row['contributor_address'],
+            row['contributor_city'],
+            row['contributor_state'],
+            row['contributor_zip']
           ] if e]),
-        recipient=row['Filer ID'],
-        recipient__state='WA',
-        url=row['URL'].replace('View report (', '')[:-1],
+        recipient__entity_type='o',
+        recipient__organization__name=row['filer_id'],
+        recipient__organization__entity_id=row['filer_id'],
+        recipient__organization__state='WA',
+        url=row['url'].replace('View report (', '')[:-1],
         regulator='PDC',
         date=receipt_date.strftime(OCD_DATETIME_FORMAT),
-        description=row['Description'],
-        note=row['Memo']
+        description=row['description'],
+        note=row['memo']
       )
     except Exception, e:
       error = 'ocd loading error: %s' % e

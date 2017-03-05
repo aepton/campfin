@@ -18,8 +18,12 @@ parent_directory = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 PDC_DATETIME_FORMAT = '%m/%d/%Y'
 
+CONTRIBS_DIRECTORY = os.path.join(parent_directory, 'data', jurisdiction, 'contributions')
+CONTRIBS_FILE = max(os.listdir(parent_directory), key=os.path.getctime)
+print 'Loading %s' % CONTRIBS_FILE
+
 missing_rows = {}
-with open('data/%s/contribs.csv' % jurisdiction) as FH:
+with open(CONTRIBS_FILE) as FH:
   reader = DictReader(FH)
   for row in reader:
     row_id = '%s-%s' % (row['ID'], row['Origin'])

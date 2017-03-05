@@ -3,7 +3,7 @@
     * ~~Use shared class for fetching logic~~
   * Process it
     * Generate CSVs
-    * Upload to Socrata
+  * Upload to Socrata
 * Make sure WA data's uploaded to Socrata
 * ~~Make sure all campfin code's on github~~
 * Should be fully controlled by script

@@ -11,8 +11,6 @@ from sodapy import Socrata
 PARENT_DIRECTORY = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 DATA_DIRECTORY = os.path.join(PARENT_DIRECTORY, 'ocd_campaign_finance')
 
-
-
 def get_socrata_auth(
     lastpass_domain=os.environ['LASTPASS_DOMAIN'],
     socrata_domain='abrahamepton.demo.socrata.com'):

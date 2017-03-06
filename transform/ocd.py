@@ -33,7 +33,7 @@ TRANSACTION_COLUMNS = [
   {
     'name': 'URL',
     'datatype': 'text',
-    'csv_name': 'url'
+    'csv_name': 'sources__url'
   },
   {
     'name': 'Amount (value)',
@@ -124,7 +124,7 @@ class Transaction(object):
       filing__action__id='',
       identifier='',
       classification='',
-      url='',
+      sources__url='',
       amount__value=Decimal('0.00'),
       amount__currency='$',
       amount__is_inkind=False,
@@ -150,7 +150,7 @@ class Transaction(object):
       'filing__action__id': filing_action,
       'identifier': identifier,
       'classification': classification,
-      'url': url,
+      'sources__url': sources__url,
       'amount__value': amount__value,
       'amount__currency': amount__currency,
       'amount__is_inkind': amount__is_inkind,

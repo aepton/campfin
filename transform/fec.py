@@ -118,7 +118,7 @@ with open(CONTRIBUTIONS_DATA_PATH) as FH:
         recipient__organization__entity_id=row['CMTE_ID'],
         recipient__organization__name=committees[row['CMTE_ID']]['name'],
         recipient__organization__state=committees[row['CMTE_ID']]['state'],
-        url='http://docquery.fec.gov/cgi-bin/fecimg/?%s' % row['IMAGE_NUM'],
+        sources__url='http://docquery.fec.gov/cgi-bin/fecimg/?%s' % row['IMAGE_NUM'],
         filing__recipient='FEC',
         date=receipt_date.strftime(OCD_DATETIME_FORMAT),
         description=row['MEMO_CD'],

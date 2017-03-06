@@ -71,7 +71,7 @@ with open(CONTRIBS_FILE) as FH:
         recipient__organization__name=row['filer_name'],
         recipient__organization__entity_id=row['filer_id'],
         recipient__organization__state='WA',
-        url=row['url'].replace('View report (', '')[:-1],
+        sources__url=row['url'].replace('View report (', '')[:-1],
         filing__recipient='PDC',
         date=receipt_date.strftime(OCD_DATETIME_FORMAT),
         description=row['description'],

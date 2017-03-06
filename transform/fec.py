@@ -98,7 +98,7 @@ with open(CONTRIBUTIONS_DATA_PATH) as FH:
     try:
       ocd_row = Transaction(
         row_id='ocd-campaignfinance-transaction/%s' % uuid.uuid5(uuid.NAMESPACE_OID, row['SUB_ID']).hex,
-        filing_action=None,
+        filing__action__id=None,
         identifier=row['SUB_ID'],
         classification='contribution',
         amount__value=Decimal(row['TRANSACTION_AMT']),
@@ -119,7 +119,7 @@ with open(CONTRIBUTIONS_DATA_PATH) as FH:
         recipient__organization__name=committees[row['CMTE_ID']]['name'],
         recipient__organization__state=committees[row['CMTE_ID']]['state'],
         url='http://docquery.fec.gov/cgi-bin/fecimg/?%s' % row['IMAGE_NUM'],
-        regulator='FEC',
+        filing__recipient='FEC',
         date=receipt_date.strftime(OCD_DATETIME_FORMAT),
         description=row['MEMO_CD'],
         note=row['MEMO_TEXT']

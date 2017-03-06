@@ -50,7 +50,7 @@ with open(CONTRIBS_FILE) as FH:
     try:
       ocd_row = Transaction(
         row_id='ocd-campaignfinance-transaction/%s' % uuid.uuid5(uuid.NAMESPACE_OID, row_id).hex,
-        filing_action=None,
+        filing__action__id=None,
         identifier=row_id,
         classification='contribution',
         amount__value=Decimal(row['amount'].replace('$', '')),
@@ -72,7 +72,7 @@ with open(CONTRIBS_FILE) as FH:
         recipient__organization__entity_id=row['filer_id'],
         recipient__organization__state='WA',
         url=row['url'].replace('View report (', '')[:-1],
-        regulator='PDC',
+        filing__recipient='PDC',
         date=receipt_date.strftime(OCD_DATETIME_FORMAT),
         description=row['description'],
         note=row['memo']

@@ -11,9 +11,14 @@ TRANSACTION_COLUMNS = [
     'csv_name': 'id'
   },
   {
+    'name': 'Regulator',
+    'datatype': 'text',
+    'csv_name': 'filing__recipient'
+  },
+  {
     'name': 'Filing Action',
     'datatype': 'text',
-    'csv_name': 'filing_action'
+    'csv_name': 'filing__action__id'
   },
   {
     'name': 'Identifier',
@@ -29,11 +34,6 @@ TRANSACTION_COLUMNS = [
     'name': 'URL',
     'datatype': 'text',
     'csv_name': 'url'
-  },
-  {
-    'name': 'Regulator',
-    'datatype': 'text',
-    'csv_name': 'regulator'
   },
   {
     'name': 'Amount (value)',
@@ -120,11 +120,11 @@ class Transaction(object):
   def __init__(
       self,
       row_id='',
-      filing_action='',
+      filing__recipient='',
+      filing__action__id='',
       identifier='',
       classification='',
       url='',
-      regulator='',
       amount__value=Decimal('0.00'),
       amount__currency='$',
       amount__is_inkind=False,
@@ -146,11 +146,11 @@ class Transaction(object):
 
     self.props = {
       'id': row_id,
-      'filing_action': filing_action,
+      'filing__recipient': regulator,
+      'filing__action__id': filing_action,
       'identifier': identifier,
       'classification': classification,
       'url': url,
-      'regulator': regulator,
       'amount__value': amount__value,
       'amount__currency': amount__currency,
       'amount__is_inkind': amount__is_inkind,

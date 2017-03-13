@@ -1,4 +1,5 @@
 import os
+import pycurl
 import requests
 import time
 import urllib2
@@ -55,6 +56,28 @@ class Fetcher(object):
           self.download_data()
 
       print 'Finished with %d bad lines' % self.error_counter
+
+  def download_data_pycurl(self):
+    if not self.retry_attempts or not self.download_url or not self.file_path:
+      return
+
+    print 'Writing %s' % self.file_path
+    with open(self.file_path, 'wb') as fh:
+      try:
+        print 'Fetching %s' % self.download_url
+        self.retry_attempts -= 1
+
+        c = pycurl.Curl()
+        c.setopt(c.URL, self.download_url)
+        c.setopt(c.WRITEDATA, fh)
+        c.perform()
+        c.close()
+
+      except Exception, e:
+        print 'Error downloading %s: %s' % (self.download_url, e)
+        if self.retry_attempts:
+          print 'Retrying %d more times' % self.retry_attempts
+          self.download_data_pycurl()
 
   def download_data_ftp(self):
     if not self.retry_attempts or not self.download_url or not self.file_path:

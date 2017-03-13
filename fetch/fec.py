@@ -39,6 +39,7 @@ def download_data(download_headers=False):
       zip_dir = client.file_path[:-1 * len('.%s' % file_type)]
       zip_ref.extractall(zip_dir)
       zip_ref.close()
+      os.remove(client.file_path)
 
       data_dir = os.path.dirname(client.file_path)
       latest_path = os.path.join(data_dir, 'latest_%s_%s' % (url_type, year))

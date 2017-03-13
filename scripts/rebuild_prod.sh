@@ -5,8 +5,10 @@ cd $APP_PATH
 
 source /home/ubuntu/.virtualenvs/campfin/bin/activate
 
-# Blow away the unneeded data directory
+# Blow away the unneeded data directories
 rm -rf data/OCD/
+rm -rf data/FEC/
+rm -rf data/WA/
 
 # Run the fetchers
 python fetch/fec.py

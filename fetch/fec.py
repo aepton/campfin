@@ -3,68 +3,63 @@ import zipfile
 from fetcher import *
 
 STATE = 'FEC'
-YEARS = ['2018', '2016', '2014', '2012', '2010', '2008', '2006', '2004', '2002', '2000']
-DATA_URLS = {}
-for YEAR in YEARS:
-  CYCLE = YEAR[2:]
-  DATA_URLS[YEAR] = {
-    'candidate_committee_link': 'ftp://ftp.fec.gov/FEC/%s/ccl%s.zip' % (YEAR, CYCLE),
-    'candidate_master': 'ftp://ftp.fec.gov/FEC/%s/cn%s.zip' % (YEAR, CYCLE),
-    'committee_master': 'ftp://ftp.fec.gov/FEC/%s/cm%s.zip' % (YEAR, CYCLE),
-    'committee_to_committee': 'ftp://ftp.fec.gov/FEC/%s/oth%s.zip' % (YEAR, CYCLE),
-    'committee_to_candidate': 'ftp://ftp.fec.gov/FEC/%s/pas2%s.zip' % (YEAR, CYCLE),
-    'expenditures': 'ftp://ftp.fec.gov/FEC/%s/oppexp%s.zip' % (YEAR, CYCLE),
-    'contributions': 'ftp://ftp.fec.gov/FEC/%s/indiv%s.zip' % (YEAR, CYCLE)
-  }
 
 HEADER_URLS = {
   'committee_master_header': 'http://www.fec.gov/finance/disclosure/metadata/cm_header_file.csv',
   'contributions_header': 'http://www.fec.gov/finance/disclosure/metadata/indiv_header_file.csv'
 }
 
-def download_data(download_headers=False):
-  for year in YEARS:
-    print 'Year %s' % year
-    for url_type, url in DATA_URLS[year].items():
-      print 'Downloading %s' % url
-      file_type = 'zip'
-      client = Fetcher(
-        download_url=url,
-        state=STATE,
-        data_type=url_type,
-        file_type=file_type)
-      client.download_data_pycurl()
+def create_latest_pointer(path, name):
+  data_dir = os.path.dirname(path)
+  latest_path = os.path.join(data_dir, name)
 
-      zip_ref = zipfile.ZipFile(client.file_path, 'r')
-      zip_dir = client.file_path[:-1 * len('.%s' % file_type)]
-      zip_ref.extractall(zip_dir)
-      zip_ref.close()
-      os.remove(client.file_path)
+  print 'Pointing %s to %s' % (latest_path, path)
 
-      data_dir = os.path.dirname(client.file_path)
-      latest_path = os.path.join(data_dir, 'latest_%s_%s' % (url_type, year))
+  try:
+    os.remove(latest_path)
+  except:
+    pass
 
-      print 'Pointing %s to %s' % (latest_path, zip_dir)
+  try:
+    os.symlink(path, latest_path)
+  except Exception, e:
+    print 'Error pointing symlink %s to %s: %s' % (latest_path, path, e)
+    return path
 
-      try:
-        os.remove(latest_path)
-      except:
-        pass
+  return latest_path
 
-      try:
-        os.symlink(zip_dir, latest_path)
-      except Exception, e:
-        print 'Error pointing symlink %s to %s: %s' % (latest_path, zip_dir, e)
+def download_headers():
+  for header_url_type, header_url in HEADER_URLS.items():
+    print 'Downloading header: %s' % header_url
+    client = Fetcher(
+      download_url=header_url,
+      state=STATE,
+      data_type=header_url_type,
+      file_type='csv')
+    client.download_data_by_line()
 
+    create_latest_pointer(client.file_path, 'latest_%s' % url_type)
+
+def download_data(url, url_type, year, download_headers=False):
   if download_headers:
-    for url in HEADER_URLS:
-      print 'Downloading %s' % url
-      client = Fetcher(
-        download_url=HEADER_URLS[url],
-        state=STATE,
-        data_type=url,
-        file_type='csv')
-      client.download_data_by_line()
+    download_headers()
 
-if __name__ == '__main__':
-  download_data(download_headers=True)
+  print 'Downloading %s' % url
+  file_type = 'zip'
+  client = Fetcher(
+    download_url=url,
+    state=STATE,
+    data_type=url_type,
+    file_type=file_type)
+  client.download_data_pycurl()
+
+  zip_ref = zipfile.ZipFile(client.file_path, 'r')
+  zip_dir = client.file_path[:-1 * len('.%s' % file_type)]
+  zip_ref.extractall(zip_dir)
+  zip_ref.close()
+  os.remove(client.file_path)
+
+  return create_latest_pointer(zip_dir, 'latest_%s_%s' % (url_type, year))
+
+def cleanup_data(url_type, year):
+  pass

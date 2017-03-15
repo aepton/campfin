@@ -25,9 +25,17 @@ fetch/
 ------
   Base class, Fetcher, and scripts that fetch data from regulators
 
+orchestration/
+--------------
+  Generates combined OCD data, in a tightly-coupled fashion allowing the system to clean up after itself as it goes.
+
 scripts/
 --------
-  Utilities that knit everything together.
+  Utilities (in process of deprecation) that knit everything together.
+
+settings/
+---------
+  Directory locations, datetime formats and other miscellaneous shared settings.
 
 transform/
 ----------

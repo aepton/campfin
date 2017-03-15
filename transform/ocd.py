@@ -1,8 +1,7 @@
 from csv import DictReader, DictWriter
 from decimal import *
 from cStringIO import StringIO
-
-OCD_DATETIME_FORMAT = '%m/%d/%Y'
+from settings import settings
 
 TRANSACTION_COLUMNS = [
   {

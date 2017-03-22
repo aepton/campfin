@@ -1,7 +1,12 @@
+import os
+import shutil
 import zipfile
 
 from fetch import fec as fec_fetch
+from fetch import wa as wa_fetch
+from settings import settings
 from transform import fec as fec_transform
+from transform import wa as wa_transform
 
 STATE = 'FEC'
 YEARS = ['2018', '2016', '2014', '2012', '2010', '2008', '2006', '2004', '2002', '2000']
@@ -19,7 +24,8 @@ for YEAR in YEARS:
   }
 
 def cleanup_data_dirs():
-  pass
+  for state in settings.STATES_IMPLEMENTED:
+    shutil.rmtree(os.path.join(settings.DATA_DIRECTORY))
 
 def download_and_process_fec_data():
   fec_fetch.download_headers()
@@ -32,7 +38,8 @@ def download_and_process_fec_data():
       fec_fetch.cleanup_data(url_type, year)
 
 def download_and_process_wa_data():
-  pass
+  data_file_path = wa_fetch.download_data()
+  wa_transform.transform_data(data_file_path)
 
 def upload_to_socrata():
   pass

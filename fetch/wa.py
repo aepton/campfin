@@ -14,6 +14,7 @@ def download_data(download_headers=False):
       data_type=url,
       file_type='csv')
     client.download_data_by_line()
+    return client.file_path
 
 if __name__ == '__main__':
   download_data()

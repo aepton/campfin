@@ -25,7 +25,7 @@ for YEAR in YEARS:
 
 def cleanup_data_dirs():
   for state in settings.STATES_IMPLEMENTED:
-    shutil.rmtree(os.path.join(settings.DATA_DIRECTORY))
+    shutil.rmtree(os.path.join(settings.DATA_DIRECTORY, state))
 
 def download_and_process_fec_data():
   fec_fetch.download_headers()

@@ -2,11 +2,11 @@ import os
 import shutil
 import zipfile
 
-from ..fetch import fec as fec_fetch
-from ..fetch import wa as wa_fetch
-from ..settings import settings
-from ..transform import fec as fec_transform
-from ..transform import wa as wa_transform
+from fetch import fec as fec_fetch
+from fetch import wa as wa_fetch
+from settings import settings
+from transform import fec as fec_transform
+from transform import wa as wa_transform
 
 STATE = 'FEC'
 YEARS = ['2018', '2016', '2014', '2012', '2010', '2008', '2006', '2004', '2002', '2000']
@@ -44,8 +44,11 @@ def download_and_process_wa_data():
 def upload_to_socrata():
   pass
 
-if __name__ == '__main__':
+def orchestrate():
   cleanup_data_dirs()
   download_and_process_fec_data()
   download_and_process_wa_data()
   upload_to_socrata()
+
+if __name__ == '__main__':
+  orchestrate()

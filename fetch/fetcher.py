@@ -5,9 +5,7 @@ import time
 import urllib2
 
 from csv import DictReader, DictWriter
-
-ROOT_DIRECTORY = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-DATA_DIRECTORY = os.path.join(ROOT_DIRECTORY, 'data')
+from settings import settings
 
 class Fetcher(object):
   def __init__(
@@ -100,12 +98,12 @@ class Fetcher(object):
           self.download_data_ftp()
 
   def setup_file(self):
-    state_directory = os.path.join(DATA_DIRECTORY, self.state)
-    if not os.path.isdir(state_directory):
+    state_directory = os.path.join(settings.DATA_DIRECTORY, self.state)
+    if not os.path.exists(state_directory) or not os.path.isdir(state_directory):
       os.mkdir(state_directory)
 
     type_directory = os.path.join(state_directory, self.data_type)
-    if not os.path.isdir(type_directory):
+    if not os.path.exists(type_directory) or not os.path.isdir(type_directory):
       os.mkdir(type_directory)
 
     self.file_path = os.path.join(type_directory, '%d.%s' % (int(time.time()), self.file_type))

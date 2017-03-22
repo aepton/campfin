@@ -38,7 +38,7 @@ def download_headers():
       file_type='csv')
     client.download_data_by_line()
 
-    create_latest_pointer(client.file_path, 'latest_%s' % url_type)
+    create_latest_pointer(client.file_path, 'latest_%s' % header_url_type)
 
 def download_data(url, url_type, year, download_headers=False):
   if download_headers:

@@ -98,12 +98,15 @@ class Fetcher(object):
           self.download_data_ftp()
 
   def setup_file(self):
+    if not os.path.isdir(settings.DATA_DIRECTORY):
+      os.mkdir(settings.DATA_DIRECTORY)
+
     state_directory = os.path.join(settings.DATA_DIRECTORY, self.state)
-    if not os.path.exists(state_directory) or not os.path.isdir(state_directory):
+    if not os.path.isdir(state_directory):
       os.mkdir(state_directory)
 
     type_directory = os.path.join(state_directory, self.data_type)
-    if not os.path.exists(type_directory) or not os.path.isdir(type_directory):
+    if not os.path.isdir(type_directory):
       os.mkdir(type_directory)
 
     self.file_path = os.path.join(type_directory, '%d.%s' % (int(time.time()), self.file_type))

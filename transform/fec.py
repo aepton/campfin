@@ -15,12 +15,13 @@ jurisdiction = 'FEC'
 
 def load_committee_metadata():
   committees = {}
+  fec_directory = os.path.join(settings.DATA_DIRECTORY, 'FEC')
 
   committee_master_header_path = os.path.join(
-    settings.FEC_DIRECTORY, 'committee_master_header', 'latest_committee_master_header')
+    fec_directory, 'committee_master_header', 'latest_committee_master_header')
 
   committee_master_data_path = os.path.join(
-    settings.FEC_DIRECTORY, 'committee_master', 'latest_committee_master')
+    fec_directory, 'committee_master', 'latest_committee_master')
 
   with open(committee_master_header_path) as fh:
     header = fh.read().strip().split(',')
@@ -43,7 +44,7 @@ def transform_data(file_path, data_type):
   # Specific settings depending on what type of file we're transforming
   if data_type == 'contributions':
     header_path = os.path.join(
-      settings.FEC_DIRECTORY, 'contributions_header', 'latest_contributions_header')
+      fec_directory, 'contributions_header', 'latest_contributions_header')
     with open(header_path) as fh:
       header = fh.read().strip().split(',')
 

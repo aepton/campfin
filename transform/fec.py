@@ -13,7 +13,7 @@ locale.setlocale(locale.LC_ALL, '')
 
 jurisdiction = 'FEC'
 
-def load_committee_metadata():
+def load_committee_metadata(year):
   committees = {}
   fec_directory = os.path.join(settings.DATA_DIRECTORY, 'FEC')
 
@@ -21,7 +21,7 @@ def load_committee_metadata():
     fec_directory, 'committee_master_header', 'latest_committee_master_header')
 
   committee_master_data_path = os.path.join(
-    fec_directory, 'committee_master', 'latest_committee_master')
+    fec_directory, 'committee_master', 'latest_committee_master_%s' % year, 'cm.txt')
 
   with open(committee_master_header_path) as fh:
     header = fh.read().strip().split(',')
@@ -36,10 +36,11 @@ def load_committee_metadata():
 
   return committees
 
-def transform_data(file_path, data_type):
+def transform_data(file_path, data_type, year):
   # General FEC settings
   delimiter = ','
   in_kind_codes = ['15Z', '24Z']
+  fec_directory = os.path.join(settings.DATA_DIRECTORY, 'FEC')
 
   # Specific settings depending on what type of file we're transforming
   if data_type == 'contributions':
@@ -51,7 +52,7 @@ def transform_data(file_path, data_type):
     delimiter = '|'
 
   # Load committee metadata (some of which we'll attach to individual rows)
-  committees = load_committee_metadata()
+  committees = load_committee_metadata(year)
 
   # Now load and transform the data we were asked to transform
   counter = 0

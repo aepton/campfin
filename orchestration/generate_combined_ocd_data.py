@@ -43,6 +43,7 @@ def download_and_process_fec_data():
 def download_and_process_wa_data():
   data_file_path = wa_fetch.download_data()
   wa_transform.transform_data(data_file_path)
+  os.remove(data_file_path)
 
 def upload_to_socrata():
   pass

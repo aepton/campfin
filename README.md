@@ -6,7 +6,7 @@ Implemented so far
 US (FEC)
 --------
   - contributions
-    - 2015/2016
+    - 2004 - 2018
 
 WA (PDC)
 --------

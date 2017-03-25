@@ -12,14 +12,20 @@ class Fetcher(object):
       self,
       download_url='',
       state='',
+      year='',
       data_type='',
       file_type='',
+      relative_name='',
+      generate_year_containers=False,
       retry_attempts=2):
 
     self.download_url = download_url
     self.state = state
+    self.year = year
     self.data_type = data_type
     self.file_type = file_type
+    self.relative_name = relative_name
+    self.generate_year_containers = generate_year_containers
     self.retry_attempts = retry_attempts
 
     self.setup_file()
@@ -105,8 +111,17 @@ class Fetcher(object):
     if not os.path.isdir(state_directory):
       os.mkdir(state_directory)
 
-    type_directory = os.path.join(state_directory, self.data_type)
+    if self.generate_year_containers:
+      year_container = os.path.join(state_directory, self.year)
+      if not os.path.isdir(year_container):
+        os.mkdir(year_container)
+    else:
+      year_container = state_directory
+
+    type_directory = os.path.join(year_container, self.data_type)
     if not os.path.isdir(type_directory):
       os.mkdir(type_directory)
 
-    self.file_path = os.path.join(type_directory, '%d.%s' % (int(time.time()), self.file_type))
+    if not self.relative_name:
+      self.relative_name = time.time()
+    self.file_path = os.path.join(type_directory, '%s.%s' % (self.relative_name, self.file_type))

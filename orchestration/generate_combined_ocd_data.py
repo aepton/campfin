@@ -37,8 +37,9 @@ def download_and_process_fec_data():
     print 'Year %s' % year
     for url_type, url in DATA_URLS[year]:
       file_path = os.path.join(fec_fetch.download_data(url, url_type, year), 'itcont.txt')
-    fec_transform.transform_data(file_path, url_type, year)
-    fec_fetch.cleanup_data(url_type, year)
+      if url_type == 'contributions':
+        fec_transform.transform_data(file_path, url_type, year)
+    fec_fetch.cleanup_data(year)
 
 def download_and_process_wa_data():
   data_file_path = wa_fetch.download_data()

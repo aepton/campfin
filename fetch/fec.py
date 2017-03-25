@@ -1,6 +1,8 @@
+import shutil
 import zipfile
 
 from fetcher import *
+from settings import settings
 
 STATE = 'FEC'
 
@@ -9,25 +11,6 @@ HEADER_URLS = {
   'contributions_header': 'http://www.fec.gov/finance/disclosure/metadata/indiv_header_file.csv'
 }
 
-def create_latest_pointer(path, name):
-  data_dir = os.path.dirname(path)
-  latest_path = os.path.join(data_dir, name)
-
-  print 'Pointing %s to %s' % (latest_path, path)
-
-  try:
-    os.remove(latest_path)
-  except:
-    pass
-
-  try:
-    os.symlink(path, latest_path)
-  except Exception, e:
-    print 'Error pointing symlink %s to %s: %s' % (latest_path, path, e)
-    return path
-
-  return latest_path
-
 def download_headers():
   for header_url_type, header_url in HEADER_URLS.items():
     print 'Downloading header: %s' % header_url
@@ -35,10 +18,10 @@ def download_headers():
       download_url=header_url,
       state=STATE,
       data_type=header_url_type,
-      file_type='csv')
+      file_type='csv',
+      relative_name=header_url_type)
     client.download_data_by_line()
 
-    create_latest_pointer(client.file_path, 'latest_%s' % header_url_type)
 
 def download_data(url, url_type, year, download_headers=False):
   if download_headers:
@@ -49,8 +32,11 @@ def download_data(url, url_type, year, download_headers=False):
   client = Fetcher(
     download_url=url,
     state=STATE,
+    year=year,
+    generate_year_containers=True,
     data_type=url_type,
-    file_type=file_type)
+    file_type=file_type,
+    relative_name=url_type)
   client.download_data_pycurl()
 
   zip_ref = zipfile.ZipFile(client.file_path, 'r')
@@ -59,7 +45,7 @@ def download_data(url, url_type, year, download_headers=False):
   zip_ref.close()
   os.remove(client.file_path)
 
-  return create_latest_pointer(zip_dir, 'latest_%s_%s' % (url_type, year))
+  return zip_dir
 
-def cleanup_data(url_type, year):
-  pass
+def cleanup_data(year):
+  shutil.rmtree(os.path.join(settings.DATA_DIRECTORY, STATE, year))

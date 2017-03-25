@@ -16,12 +16,13 @@ jurisdiction = 'FEC'
 def load_committee_metadata(year):
   committees = {}
   fec_directory = os.path.join(settings.DATA_DIRECTORY, 'FEC')
+  year_directory = os.path.join(fec_directory, year)
 
   committee_master_header_path = os.path.join(
-    fec_directory, 'committee_master_header', 'latest_committee_master_header')
+    fec_directory, 'committee_master_header', 'committee_master_header.csv')
 
   committee_master_data_path = os.path.join(
-    fec_directory, 'committee_master', 'latest_committee_master_%s' % year, 'cm.txt')
+    year_directory, 'committee_master', 'committee_master', 'cm.txt')
 
   with open(committee_master_header_path) as fh:
     header = fh.read().strip().split(',')
@@ -41,11 +42,11 @@ def transform_data(file_path, data_type, year):
   delimiter = ','
   in_kind_codes = ['15Z', '24Z']
   fec_directory = os.path.join(settings.DATA_DIRECTORY, 'FEC')
+  year_directory = os.path.join(fec_directory, year)
 
   # Specific settings depending on what type of file we're transforming
   if data_type == 'contributions':
-    header_path = os.path.join(
-      fec_directory, 'contributions_header', 'latest_contributions_header')
+    header_path = os.path.join(fec_directory, 'contributions_header', 'contributions_header.csv')
     with open(header_path) as fh:
       header = fh.read().strip().split(',')
 
@@ -71,7 +72,7 @@ def transform_data(file_path, data_type, year):
         continue
 
       try:
-        ocd_row = Transaction(
+        ocd_row = ocd.Transaction(
           row_id='ocd-campaignfinance-transaction/%s' % uuid.uuid5(
             uuid.NAMESPACE_OID, row['SUB_ID']).hex,
           filing__action__id=None,

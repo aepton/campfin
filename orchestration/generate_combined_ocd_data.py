@@ -9,7 +9,7 @@ from transform import fec as fec_transform
 from transform import wa as wa_transform
 
 STATE = 'FEC'
-YEARS = ['2018', '2016', '2014', '2012', '2010', '2008', '2006', '2004', '2002', '2000']
+YEARS = ['2018', '2016', '2014', '2012', '2010', '2008', '2006', '2004']
 DATA_URLS = {}
 for YEAR in YEARS:
   CYCLE = YEAR[2:]

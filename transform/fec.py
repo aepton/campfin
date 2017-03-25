@@ -97,7 +97,7 @@ def transform_data(file_path, data_type, year):
           recipient__organization__state=committees[row['CMTE_ID']]['state'],
           sources__url='http://docquery.fec.gov/cgi-bin/fecimg/?%s' % row['IMAGE_NUM'],
           filing__recipient='FEC',
-          date=receipt_date.strftime(settings.OCD_DATETIME_FORMAT),
+          date=receipt_date.strftime(settings.OCD_DATETIME_FMT),
           description=row['MEMO_CD'],
           note=row['MEMO_TEXT']
         )

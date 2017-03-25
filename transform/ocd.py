@@ -146,7 +146,7 @@ class Transaction(object):
     self.props = {
       'id': row_id,
       'filing__recipient': filing__recipient,
-      'filing__action__id': filing_action,
+      'filing__action__id': filing__action__id,
       'identifier': identifier,
       'classification': classification,
       'sources__url': sources__url,

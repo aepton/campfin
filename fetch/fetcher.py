@@ -40,6 +40,7 @@ class Fetcher(object):
         print 'Fetching %s' % self.download_url
         self.retry_attempts -= 1
         self.error_counter = 0
+        self.success_counter = 0
         self.download_response = requests.get(self.download_url, stream=True)
 
         if self.download_response.encoding is None:
@@ -49,6 +50,7 @@ class Fetcher(object):
           if line:
             try:
               file_handle.write('%s%s' % (unicode(line, errors='ignore'), os.linesep))
+              self.success_counter += 1
             except Exception, e:
               print e
               self.error_counter += 1
@@ -59,7 +61,8 @@ class Fetcher(object):
           print 'Retrying %d more times' % self.retry_attempts
           self.download_data()
 
-      print 'Finished with %d bad lines' % self.error_counter
+      print 'Finished with %d bad lines and %d successful ones' % (
+        self.error_counter, self.success_counter)
 
   def download_data_pycurl(self):
     if not self.retry_attempts or not self.download_url or not self.file_path:

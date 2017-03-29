@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 import zipfile
 
 from fetch import fec as fec_fetch
@@ -47,7 +48,17 @@ def download_and_process_wa_data():
   os.remove(data_file_path)
 
 def upload_to_socrata():
-  pass
+  home = '/home/ubuntu'
+  datasync = os.path.join(home, 'DataSync-1.8.0.jar')
+  config = os.path.join(home, 'config.json')
+  control = os.path.join(home, 'control.json')
+  csv = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
+  dataset = 'fac5-i55pj'
+  print subprocess.Popen(
+    "java -jar %s -c %s -f %s -h true -m upsert -ph true -cf %s -i %s" % (
+      datasync, config, csv, control, dataset)
+    shell=True,
+    stdout=subprocess.PIPE).stdout.read()
 
 def orchestrate():
   cleanup_data_dirs()

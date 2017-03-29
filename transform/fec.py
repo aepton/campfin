@@ -110,6 +110,9 @@ def transform_data(file_path, data_type, year):
 
       # Handle contributions to a particular state, and from within that state
       for state in set([committees[row['CMTE_ID']]['state'], row['STATE']]):
+        if state.find('/') != -1:
+          print 'Odd, found slash in state for %s' % row
+          state = state.replace('/', '')
         path = os.path.join(settings.OCD_DIRECTORY, '%s.csv' % state)
 
         if path not in file_handles:

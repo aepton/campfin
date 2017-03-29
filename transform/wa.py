@@ -57,7 +57,7 @@ def transform_data(contribs_file_path):
           recipient__organization__state='WA',
           sources__url=row['url'].replace('View report (', '')[:-1],
           filing__recipient='PDC',
-          date=receipt_date.strftime(settings.OCD_DATETIME_FORMAT),
+          date=receipt_date.strftime(settings.OCD_DATETIME_FMT),
           description=row['description'],
           note=row['memo']
         )

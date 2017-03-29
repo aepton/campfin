@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import zipfile
 
+from datetime import datetime
 from fetch import fec as fec_fetch
 from fetch import wa as wa_fetch
 from settings import settings
@@ -61,10 +62,19 @@ def upload_to_socrata():
     stdout=subprocess.PIPE).stdout.read()
 
 def orchestrate():
+  print 'Starting cleanup at %s' % datetime.now().isoformat()
   cleanup_data_dirs()
+
+  print 'Starting FEC at %s' % datetime.now().isoformat()
   download_and_process_fec_data()
+
+  print 'Starting WA at %s' % datetime.now().isoformat()
   download_and_process_wa_data()
+
+  print 'Starting upload at %s' % datetime.now().isoformat()
   upload_to_socrata()
+
+  print 'Done with everything at %s' % datetime.now().isoformat()
 
 if __name__ == '__main__':
   orchestrate()

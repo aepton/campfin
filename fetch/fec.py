@@ -51,11 +51,14 @@ def cleanup_data(year):
   shutil.rmtree(os.path.join(settings.DATA_DIRECTORY, STATE, year))
 
 def cleanup_unnecessary_contribution_files(year):
-  shutil.rmtree(
-    os.path.join(
-      settings.DATA_DIRECTORY,
-      STATE,
-      year,
-      'contributions',
-      'contributions',
-      'by_date'))
+  try:
+    shutil.rmtree(
+      os.path.join(
+        settings.DATA_DIRECTORY,
+        STATE,
+        year,
+        'contributions',
+        'contributions',
+        'by_date'))
+  except OSError:
+    print 'No by_date for %s' % year

@@ -49,3 +49,13 @@ def download_data(url, url_type, year, download_headers=False):
 
 def cleanup_data(year):
   shutil.rmtree(os.path.join(settings.DATA_DIRECTORY, STATE, year))
+
+def cleanup_unnecessary_contribution_files(year):
+  shutil.rmtree(
+    os.path.join(
+      settings.DATA_DIRECTORY,
+      STATE,
+      year,
+      'contributions',
+      'contributions',
+      'by_date'))

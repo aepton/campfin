@@ -108,24 +108,26 @@ def transform_data(file_path, data_type, year):
         missing_rows[error] += 1
         continue
 
-      path = os.path.join(settings.OCD_DIRECTORY, '%s.csv' % committees[row['CMTE_ID']]['state'])
+      # Handle contributions to a particular state, and from within that state
+      for state in set(committees[row['CMTE_ID']]['state'], row['STATE']):
+        path = os.path.join(settings.OCD_DIRECTORY, '%s.csv' % state)
 
-      if path not in file_handles:
-        try:
-          os.makedirs(settings.OCD_DIRECTORY)
-        except OSError as exception:
-          if exception.errno != errno.EEXIST:
-            raise
+        if path not in file_handles:
+          try:
+            os.makedirs(settings.OCD_DIRECTORY)
+          except OSError as exception:
+            if exception.errno != errno.EEXIST:
+              raise
 
-        if not os.path.exists(path):
-          with open(path, 'w+') as fh:
-            writer = DictWriter(fh, ocd.TRANSACTION_CSV_HEADER)
-            writer.writeheader()
-            fh.close()
+          if not os.path.exists(path):
+            with open(path, 'w+') as fh:
+              writer = DictWriter(fh, ocd.TRANSACTION_CSV_HEADER)
+              writer.writeheader()
+              fh.close()
 
-        file_handles[path] = open(path, 'a')
+          file_handles[path] = open(path, 'a')
 
-      file_handles[path].write(ocd_row.to_csv_row())
+        file_handles[path].write(ocd_row.to_csv_row())
 
       counter += 1
       if counter % 1000000 == 0:

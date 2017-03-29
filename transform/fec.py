@@ -109,7 +109,7 @@ def transform_data(file_path, data_type, year):
         continue
 
       # Handle contributions to a particular state, and from within that state
-      for state in set(committees[row['CMTE_ID']]['state'], row['STATE']):
+      for state in set([committees[row['CMTE_ID']]['state'], row['STATE']]):
         path = os.path.join(settings.OCD_DIRECTORY, '%s.csv' % state)
 
         if path not in file_handles:

@@ -113,6 +113,8 @@ def transform_data(file_path, data_type, year):
         if state.find('/') != -1:
           print 'Odd, found slash in state for %s' % row
           state = state.replace('/', '')
+        if state not in settings.STATES_IMPLEMENTED:
+          continue
         path = os.path.join(settings.OCD_DIRECTORY, '%s.csv' % state)
 
         if path not in file_handles:

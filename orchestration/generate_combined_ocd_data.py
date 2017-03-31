@@ -57,7 +57,7 @@ def upload_to_socrata():
   csv = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
   dataset = 'banj-bkhc'
   print subprocess.Popen(
-    "java -jar %s -c %s -f %s -h true -m Upsert -ph true -cf %s -i %s" % (
+    "java -jar %s -c %s -f %s -h true -m upsert -ph true -cf %s -i %s" % (
       datasync, config, csv, control, dataset),
     shell=True,
     stdout=subprocess.PIPE).stdout.read()

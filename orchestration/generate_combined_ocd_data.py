@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import subprocess
@@ -62,20 +63,27 @@ def upload_to_socrata():
     shell=True,
     stdout=subprocess.PIPE).stdout.read()
 
+def setup_logging(log_name):
+  logging.basicConfig(
+    filename=os.path.join(settings.LOG_DIR, '%s.log' % log_name),
+    format='%(asctime)s %(filename)s:%(lineno)d %(funcName)s',
+    level=logging.INFO)
+
 def orchestrate():
-  print 'Starting cleanup at %s' % datetime.now().isoformat()
+  setup_logging('rebuild')
+  logging.info('Starting cleanup')
   cleanup_data_dirs()
 
-  print 'Starting FEC at %s' % datetime.now().isoformat()
+  logging.info('Starting FEC')
   download_and_process_fec_data()
 
-  print 'Starting WA at %s' % datetime.now().isoformat()
+  logging.info('Starting WA')
   download_and_process_wa_data()
 
-  print 'Starting upload at %s' % datetime.now().isoformat()
+  logging.info('Starting upload')
   upload_to_socrata()
 
-  print 'Done with everything at %s' % datetime.now().isoformat()
+  logging.info('Done with everything')
 
 if __name__ == '__main__':
   orchestrate()

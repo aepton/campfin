@@ -9,3 +9,5 @@ OCD_DATETIME_FMT = '%m/%d/%Y'
 PDC_DATETIME_FORMAT = '%m/%d/%Y'
 
 STATES_IMPLEMENTED = ['OCD', 'FEC', 'WA', 'IL', 'ID', 'OR', 'HI']
+
+LOG_DIR = os.path.join(ROOT_DIRECTORY, 'logs')

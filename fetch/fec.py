@@ -1,3 +1,4 @@
+import logging
 import shutil
 import zipfile
 
@@ -13,7 +14,7 @@ HEADER_URLS = {
 
 def download_headers():
   for header_url_type, header_url in HEADER_URLS.items():
-    print 'Downloading header: %s' % header_url
+    logging.info('Downloading header: %s' % header_url)
     client = Fetcher(
       download_url=header_url,
       state=STATE,
@@ -27,7 +28,7 @@ def download_data(url, url_type, year, download_headers=False):
   if download_headers:
     download_headers()
 
-  print 'Downloading %s' % url
+  logging.info('Downloading %s' % url)
   file_type = 'zip'
   client = Fetcher(
     download_url=url,
@@ -61,4 +62,4 @@ def cleanup_unnecessary_contribution_files(year):
         'contributions',
         'by_date'))
   except OSError:
-    print 'No by_date for %s' % year
+    logging.warning('No by_date for %s' % year)

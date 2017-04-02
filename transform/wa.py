@@ -89,12 +89,12 @@ def transform_data(contribs_file_path):
 
       counter += 1
       if counter % 1000000 == 0:
-        print locale.format('%d', counter, grouping=True)
-    print locale.format('%d', counter, grouping=True)
+        logging.info('Processed %s' % locale.format('%d', counter, grouping=True))
+    logging.info('Finished processing with %s' % locale.format('%d', counter, grouping=True))
 
-  print 'Errors:'
+  logging.info('Errors:')
   for error in missing_rows:
-    print '%s: %d' % (error, missing_rows[error])
+    logging.info('%s: %d' % (error, missing_rows[error]))
 
 if __name__ == '__main__':
   transform_data()

@@ -1,3 +1,5 @@
+import logging
+
 from fetcher import *
 
 STATE = 'WA'
@@ -7,7 +9,7 @@ DATA_URLS = {
 
 def download_data(download_headers=False):
   for url in DATA_URLS:
-    print 'Downloading %s' % url
+    logging.info('Downloading %s' % url)
     client = Fetcher(
       download_url=DATA_URLS[url],
       state=STATE,

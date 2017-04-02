@@ -1,5 +1,6 @@
 import errno
 import locale
+import logging
 import ocd
 import os
 import uuid
@@ -111,7 +112,7 @@ def transform_data(file_path, data_type, year):
       # Handle contributions to a particular state, and from within that state
       for state in set([committees[row['CMTE_ID']]['state'], row['STATE']]):
         if state.find('/') != -1:
-          print 'Odd, found slash in state for %s' % row
+          logging.warning('Odd, found slash in state for %s' % row)
           state = state.replace('/', '')
         if state not in settings.STATES_IMPLEMENTED:
           continue
@@ -136,9 +137,9 @@ def transform_data(file_path, data_type, year):
 
       counter += 1
       if counter % 1000000 == 0:
-        print locale.format('%d', counter, grouping=True)
-    print locale.format('%d', counter, grouping=True)
+        logging.info('Processed %s' % locale.format('%d', counter, grouping=True))
+    logging.info('Finished processing with %s' % locale.format('%d', counter, grouping=True))
 
-  print 'Errors:'
+  logging.info('Errors:')
   for error in missing_rows:
-    print '%s: %d' % (error, missing_rows[error])
+    logging.info('%s: %d' % (error, missing_rows[error]))

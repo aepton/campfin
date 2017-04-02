@@ -37,7 +37,7 @@ def download_and_process_fec_data():
   fec_fetch.download_headers()
 
   for year in YEARS:
-    print 'Year %s' % year
+    logging.info('Fetching FEC year %s' % year)
     for url_type, url in DATA_URLS[year]:
       file_path = os.path.join(fec_fetch.download_data(url, url_type, year), 'itcont.txt')
       if url_type == 'contributions':
@@ -57,16 +57,16 @@ def upload_to_socrata():
   control = os.path.join(home, 'control.json')
   csv = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
   dataset = 'rvjy-yeu3'
-  print subprocess.Popen(
+  logging.info(subprocess.Popen(
     "java -jar %s -c %s -f %s -h true -m upsert -ph true -cf %s -i %s" % (
       datasync, config, csv, control, dataset),
     shell=True,
-    stdout=subprocess.PIPE).stdout.read()
+    stdout=subprocess.PIPE).stdout.read())
 
 def setup_logging(log_name):
   logging.basicConfig(
     filename=os.path.join(settings.LOG_DIR, '%s.log' % log_name),
-    format='%(asctime)s %(filename)s:%(lineno)d %(funcName)s',
+    format='%(levelname)s %(asctime)s %(filename)s:%(lineno)d in %(funcName)s: %(message)s',
     level=logging.INFO)
 
 def orchestrate():

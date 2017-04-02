@@ -1,5 +1,6 @@
 import delegator
 import json
+import logging
 import os
 import requests
 import urllib
@@ -55,10 +56,10 @@ def upload_file(state, auth):
   try:
     file_id = r.json()['fileId']
   except:
-    print 'Error scanning file for %s: %s' % (state, r.text)
+    logging.warning('Error scanning file for %s: %s' % (state, r.text))
     return
 
-  print 'Posted file, got fileId %s' % file_id
+  logging.info('Posted file, got fileId %s' % file_id)
 
   r = requests.post(
     'https://abrahamepton.demo.socrata.com/imports2.json?ingress_strategy=nbe&nbe=true',
@@ -75,9 +76,9 @@ def upload_file(state, auth):
     })
 
   try:
-    print 'Got status code %s for dataset %s' % (r.status_code, r.json()['id'])
+    logging.info('Got status code %s for dataset %s' % (r.status_code, r.json()['id']))
   except KeyError:
-    print 'Error uploading; got %s' % r.text
+    logging.warning('Error uploading; got %s' % r.text)
     return
 
   client = Socrata(
@@ -98,5 +99,5 @@ def upload_file(state, auth):
 if __name__ == '__main__':
   auth = get_socrata_auth()
   for state in ENABLED_STATES:
-    print 'Uploading %s' % (state)
+    logging.info('Uploading %s' % (state))
     upload_file(state, auth)

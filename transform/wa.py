@@ -1,5 +1,6 @@
 import errno
 import locale
+import logging
 import os
 import uuid
 

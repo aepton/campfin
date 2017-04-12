@@ -84,6 +84,7 @@ def orchestrate():
   upload_to_socrata()
 
   logging.info('Done with everything')
+  print 'testing logging to file'
 
 if __name__ == '__main__':
   orchestrate()

@@ -66,6 +66,7 @@ def upload_to_socrata():
 def setup_logging(log_name):
   logging.basicConfig(
     filename=os.path.join(settings.LOG_DIR, '%s.log' % log_name),
+    filemode='a',
     format='%(levelname)s %(asctime)s %(filename)s:%(lineno)d in %(funcName)s: %(message)s',
     level=logging.INFO)
 

@@ -112,6 +112,21 @@ TRANSACTION_COLUMNS = [
     'name': 'Note',
     'datatype': 'text',
     'csv_name': 'note'
+  },
+  {
+    'name': 'Donor Hash',
+    'datatype': 'text',
+    'csv_name': 'donor_hash'
+  },
+  {
+    'name': 'Cluster ID',
+    'datatype': 'text',
+    'csv_name': 'cluster_id'
+  },
+  {
+    'name': 'Related Cluster ID',
+    'datatype': 'text',
+    'csv_name': 'related_cluster_id'
   }
 ]
 

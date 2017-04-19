@@ -37,8 +37,8 @@ def create_dynamodb_table():
       'AttributeType': 'S'
     }],
     ProvisionedThroughput={
-      'ReadCapacityUnits': 0,
-      'WriteCapacityUnits': 0
+      'ReadCapacityUnits': 1,
+      'WriteCapacityUnits': 1
     }
   )
 
@@ -153,7 +153,7 @@ def store_donor_cluster_map_in_dynamodb():
           }
         )
 
-  table = set_dynamodb_throughput(table, 'WriteCapacityUnits', 0)
+  table = set_dynamodb_throughput(table, 'WriteCapacityUnits', 1)
 
 if __name__ == '__main__':
   #train_dedupe()

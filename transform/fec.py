@@ -64,6 +64,7 @@ def transform_data(file_path, data_type, year):
 
   # Stash the DynamoDB table we're using to look up clusters
   table = deduper.get_dedupe_table()
+  table = set_dynamodb_throughput(table, 'ReadCapacityUnits', 200)
   with open(file_path) as fh:
     reader = DictReader(fh, header, delimiter=delimiter)
     for row in reader:
@@ -145,6 +146,8 @@ def transform_data(file_path, data_type, year):
       if counter % 1000000 == 0:
         logging.info('Processed %s' % locale.format('%d', counter, grouping=True))
     logging.info('Finished processing with %s' % locale.format('%d', counter, grouping=True))
+
+  table = set_dynamodb_throughput(table, 'ReadCapacityUnits', 1)
 
   logging.info('Errors:')
   for error in missing_rows:

@@ -8,6 +8,7 @@ import uuid
 from csv import DictReader, DictWriter
 from datetime import datetime
 from decimal import *
+from deduplication import deduper
 from settings import settings
 
 locale.setlocale(locale.LC_ALL, '')
@@ -60,6 +61,9 @@ def transform_data(file_path, data_type, year):
   counter = 0
   missing_rows = {}
   file_handles = {}
+
+  # Stash the DynamoDB table we're using to look up clusters
+  table = deduper.get_dedupe_table()
   with open(file_path) as fh:
     reader = DictReader(fh, header, delimiter=delimiter)
     for row in reader:
@@ -108,6 +112,8 @@ def transform_data(file_path, data_type, year):
           missing_rows[error] = 0
         missing_rows[error] += 1
         continue
+
+      ocd_row.set_cluster_id(table)
 
       # Handle contributions to a particular state, and from within that state
       for state in set([committees[row['CMTE_ID']]['state'], row['STATE']]):

@@ -7,6 +7,7 @@ import uuid
 from csv import DictReader, DictWriter
 from datetime import datetime
 from decimal import *
+from deduplication import deduper
 from ocd import *
 from settings import settings
 
@@ -19,6 +20,8 @@ def transform_data(contribs_file_path):
   file_handles = {}
   missing_rows = {}
 
+  # Stash the DynamoDB table we're using to look up clusters
+  table = deduper.get_dedupe_table()
   with open(contribs_file_path) as fh:
     reader = DictReader(fh)
     for row in reader:
@@ -68,6 +71,8 @@ def transform_data(contribs_file_path):
           missing_rows[error] = 0
         missing_rows[error] += 1
         continue
+
+      ocd_row.set_cluster_id(table)
 
       path = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
 

@@ -22,6 +22,48 @@ def generate_donor_hash(record):
 
   return uuid.uuid5(uuid.NAMESPACE_OID, hashable_donor).hex
 
+def create_dynamodb_table():
+  session = boto3.Session(profile_name='abe')
+  dynamodb = session.client('dynamodb')
+
+  table = dynamodb.create_table(
+    TableName='dedupe',
+    KeySchema=[{
+      'AttributeName': 'donorHash',
+      'KeyType': 'HASH'
+    }],
+    AttributeDefinitions=[{
+      'AttributeName': 'donorHash',
+      'AttributeType': 'S'
+    }],
+    ProvisionedThroughput={
+      'ReadCapacityUnits': 0,
+      'WriteCapacityUnits': 0
+    }
+  )
+
+def get_dynamodb_table(table_name):
+  session = boto3.Session(profile_name='abe')
+  dynamodb = session.resource('dynamodb')
+  return dynamodb.Table(table_name)
+
+def set_dynamodb_throughput(table, operation, capacity):
+  read_operation = 'ReadCapacityUnits'
+  write_operation = 'WriteCapacityUnits'
+
+  if table.provisioned_throughput[operation] != capacity:
+    throughput = {operation: capacity}
+
+    # Leave the property we didn't intend to modify unmodified
+    if operation == read_operation:
+      throughput[write_operation] = table.provisioned_throughput[write_operation]
+    else:
+      throughput[read_operation] = table.provisioned_throughput[read_operation]
+
+    table = table.update(ProvisionedThroughput=throughput)
+
+  return table
+
 def load_records(limit):
   records = {}
 
@@ -95,37 +137,14 @@ def cluster_records():
           'donorHash': generate_donor_hash(records[contrib])
         })
 
-def create_dynamodb_table():
-  session = boto3.Session(profile_name='abe')
-  dynamodb = session.client('dynamodb')
-
-  table = dynamodb.create_table(
-    TableName='dedupe',
-    KeySchema=[{
-      'AttributeName': 'donorHash',
-      'KeyType': 'HASH'
-    }],
-    AttributeDefinitions=[{
-      'AttributeName': 'donorHash',
-      'AttributeType': 'S'
-    }],
-    ProvisionedThroughput={
-      'ReadCapacityUnits': 5,
-      'WriteCapacityUnits': 5
-    }
-  )
-
 def store_donor_cluster_map_in_dynamodb():
-  session = boto3.Session(profile_name='abe')
-  dynamodb = session.resource('dynamodb')
-  table = dynamodb.Table('dedupe')
-
-  print table.item_count
+  table = get_dynamodb_table('dedupe')
+  table = set_dynamodb_throughput(table, 'WriteCapacityUnits', 100)
 
   with open('clusters.csv') as fh:
     reader = DictReader(fh)
 
-    with table.batch_writer(overwrite_by_pkeys=['donorHash']) as batch:
+    with table.batch_writer() as batch:
       for row in reader:
         table.put_item(
           Item={
@@ -134,10 +153,10 @@ def store_donor_cluster_map_in_dynamodb():
           }
         )
 
-  print 'Table has %d items' % table.item_count
+  table = set_dynamodb_throughput(table, 'WriteCapacityUnits', 0)
 
 if __name__ == '__main__':
   #train_dedupe()
-  cluster_records()
+  #cluster_records()
   #create_dynamodb_table()
   store_donor_cluster_map_in_dynamodb()

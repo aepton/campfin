@@ -1,5 +1,9 @@
+import boto3
+import uuid
+
 from csv import DictReader, DictWriter
 from decimal import *
+from deduplication import deduper
 from cStringIO import StringIO
 from settings import settings
 
@@ -164,8 +168,29 @@ class Transaction(object):
       'recipient__organization__state': recipient__organization__state,
       'date': date,
       'description': description,
-      'note': note
+      'note': note,
+      'donor_hash': '',
+      'cluster_id': '',
+      'related_cluster_id': ''
     }
+
+    self.set_donor_hash()
+
+  def set_donor_hash(self):
+    record = {
+      'Name': self.props['sender__person__name'],
+      'Address': self.props['sender__person__location'],
+      'Employer': self.props['sender__person__employer'],
+      'Occupation': self.props['sender__person__occupation']
+    }
+    self.props['donor_hash'] = deduper.generate_donor_hash(record)
+
+
+  def set_cluster_id(self, table=None):
+    if not table:
+      table = deduper.get_dedupe_table()
+    response = table.get_item(Key={'string': self.props['donor_hash']}, ConsistentRead=False)
+    self.props['cluster_id'] = response['Item']['clusterID']
 
   def to_csv_row(self):
     row_output = StringIO()

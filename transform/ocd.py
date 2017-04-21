@@ -205,11 +205,15 @@ class Transaction(object):
   def set_cluster_id(self, table=None):
     if not table:
       table = deduper.get_dedupe_table()
-    response = table.get_item(Key={'donorHash': self.props['donor_hash']}, ConsistentRead=False)
+    response = table.get_item(
+      Key={'donorHash': self.props['donor_hash']},
+      ConsistentRead=False,
+      ReturnConsumedCapacity='NONE'
+    )
     try:
       self.props['cluster_id'] = response['Item']['clusterID']
     except Exception, e:
-      logging.info('Error %s fetching cluster ID for %s' % (e, self.props['donor_hash']))
+      pass
 
   def to_csv_row(self):
     row_output = StringIO()

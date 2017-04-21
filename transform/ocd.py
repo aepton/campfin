@@ -204,7 +204,7 @@ class Transaction(object):
   def set_cluster_id(self, table=None):
     if not table:
       table = deduper.get_dedupe_table()
-    response = table.get_item(Key={'string': self.props['donor_hash']}, ConsistentRead=False)
+    response = table.get_item(Key={'donorHash': self.props['donor_hash']}, ConsistentRead=False)
     self.props['cluster_id'] = response['Item']['clusterID']
 
   def to_csv_row(self):

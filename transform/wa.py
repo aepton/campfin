@@ -22,7 +22,7 @@ def transform_data(contribs_file_path):
 
   # Stash the DynamoDB table we're using to look up clusters
   table = deduper.get_dynamodb_table('dedupe')
-  table = set_dynamodb_throughput(table, 'ReadCapacityUnits', 200)
+  table = deduper.set_dynamodb_throughput(table, 'ReadCapacityUnits', 200)
   with open(contribs_file_path) as fh:
     reader = DictReader(fh)
     for row in reader:
@@ -99,7 +99,7 @@ def transform_data(contribs_file_path):
         logging.info('Processed %s' % locale.format('%d', counter, grouping=True))
     logging.info('Finished processing with %s' % locale.format('%d', counter, grouping=True))
 
-  table = set_dynamodb_throughput(table, 'ReadCapacityUnits', 1)
+  table = deduper.set_dynamodb_throughput(table, 'ReadCapacityUnits', 1)
 
   logging.info('Errors:')
   for error in missing_rows:

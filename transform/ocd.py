@@ -1,4 +1,5 @@
 import boto3
+import logging
 import uuid
 
 from csv import DictReader, DictWriter
@@ -205,7 +206,10 @@ class Transaction(object):
     if not table:
       table = deduper.get_dedupe_table()
     response = table.get_item(Key={'donorHash': self.props['donor_hash']}, ConsistentRead=False)
-    self.props['cluster_id'] = response['Item']['clusterID']
+    try:
+      self.props['cluster_id'] = response['Item']['clusterID']
+    except Exception, e:
+      logging.info('Error %s fetching cluster ID for %s' % (e, self.props['donor_hash']))
 
   def to_csv_row(self):
     row_output = StringIO()

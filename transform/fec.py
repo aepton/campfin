@@ -64,7 +64,7 @@ def transform_data(file_path, data_type, year):
 
   # Stash the DynamoDB table we're using to look up clusters
   table = deduper.get_dynamodb_table('dedupe')
-  table = deduper.set_dynamodb_throughput(table, 'ReadCapacityUnits', 200)
+  table = deduper.set_dynamodb_throughput(table, 'ReadCapacityUnits', 10)
   with open(file_path) as fh:
     reader = DictReader(fh, header, delimiter=delimiter)
     for row in reader:

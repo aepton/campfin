@@ -62,11 +62,15 @@ def transform_data(file_path, data_type, year):
   missing_rows = {}
   file_handles = {}
 
-  # Stash the DynamoDB table we're using to look up clusters
   table = deduper.get_dynamodb_table('dedupe')
-  table = deduper.set_dynamodb_throughput(table, 'ReadCapacityUnits', 10)
+  table = deduper.set_dynamodb_throughput(
+    table, 'ReadCapacityUnits', settings.DYNAMODB_READ_UNITS_HEAVY)
+
   with open(file_path) as fh:
     reader = DictReader(fh, header, delimiter=delimiter)
+
+    rows_pending_cluster = []
+
     for row in reader:
       try:
         receipt_date = datetime.strptime(row['TRANSACTION_DT'], settings.FEC_DATETIME_FMT)
@@ -114,40 +118,45 @@ def transform_data(file_path, data_type, year):
         missing_rows[error] += 1
         continue
 
-      ocd_row.set_cluster_id(table)
+      if len(rows_pending_cluster) < DYNAMODB_READ_BATCH_SIZE:
+        rows_pending_cluster.append(ocd_row)
+      else:
+        clustered_rows, rows_pending_cluster = deduper.batch_set_cluster_ids(rows_pending_cluster)
 
-      # Handle contributions to a particular state, and from within that state
-      for state in set([committees[row['CMTE_ID']]['state'], row['STATE']]):
-        if state.find('/') != -1:
-          logging.warning('Odd, found slash in state for %s' % row)
-          state = state.replace('/', '')
-        if state not in settings.STATES_IMPLEMENTED:
-          continue
-        path = os.path.join(settings.OCD_DIRECTORY, '%s.csv' % state)
+        for clustered_row in clustered_rows:
+          # Handle contributions to a particular state, and from within that state
+          for state in set([committees[row['CMTE_ID']]['state'], row['STATE']]):
+            if state.find('/') != -1:
+              logging.warning('Odd, found slash in state for %s' % row)
+              state = state.replace('/', '')
+            if state not in settings.STATES_IMPLEMENTED:
+              continue
+            path = os.path.join(settings.OCD_DIRECTORY, '%s.csv' % state)
 
-        if path not in file_handles:
-          try:
-            os.makedirs(settings.OCD_DIRECTORY)
-          except OSError as exception:
-            if exception.errno != errno.EEXIST:
-              raise
+            if path not in file_handles:
+              try:
+                os.makedirs(settings.OCD_DIRECTORY)
+              except OSError as exception:
+                if exception.errno != errno.EEXIST:
+                  raise
 
-          if not os.path.exists(path):
-            with open(path, 'w+') as fh:
-              writer = DictWriter(fh, ocd.TRANSACTION_CSV_HEADER)
-              writer.writeheader()
-              fh.close()
+              if not os.path.exists(path):
+                with open(path, 'w+') as fh:
+                  writer = DictWriter(fh, ocd.TRANSACTION_CSV_HEADER)
+                  writer.writeheader()
+                  fh.close()
 
-          file_handles[path] = open(path, 'a')
+              file_handles[path] = open(path, 'a')
 
-        file_handles[path].write(ocd_row.to_csv_row())
+            file_handles[path].write(clustered_row.to_csv_row())
 
-      counter += 1
-      if counter % 1000000 == 0:
-        logging.info('Processed %s' % locale.format('%d', counter, grouping=True))
+          counter += 1
+          if counter % 1000000 == 0:
+            logging.info('Processed %s' % locale.format('%d', counter, grouping=True))
     logging.info('Finished processing with %s' % locale.format('%d', counter, grouping=True))
 
-  table = deduper.set_dynamodb_throughput(table, 'ReadCapacityUnits', 1)
+  table = deduper.set_dynamodb_throughput(
+    table, 'ReadCapacityUnits', settings.DYNAMODB_READ_UNITS_MINIMAL)
 
   logging.info('Errors:')
   for error in missing_rows:

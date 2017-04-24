@@ -47,6 +47,10 @@ def get_dynamodb_table(table_name):
   dynamodb = session.resource('dynamodb')
   return dynamodb.Table(table_name)
 
+def get_dynamodb_client():
+  session = boto3.Session(profile_name='abe')
+  return session.client('dynamodb')
+
 def set_dynamodb_throughput(table, operation, capacity):
   read_operation = 'ReadCapacityUnits'
   write_operation = 'WriteCapacityUnits'
@@ -63,6 +67,34 @@ def set_dynamodb_throughput(table, operation, capacity):
     table = table.update(ProvisionedThroughput=throughput)
 
   return table
+
+def batch_set_cluster_ids(rows):
+  client = get_dynamodb_client()
+
+  keys = [row.props['donor_hash'] for row in rows]
+
+  response = client.batch_get_item(
+    RequestItems={
+      'dedupe': {
+        'Keys': [{'donorHash': {'S': key}} for key in keys]
+      }
+    }
+  )
+
+  matches = {}
+  for key in response['Responses']['dedupe']:
+    matches[key['donorHash']] = key['clusterID']
+
+  clustered_rows = []
+  unclustered_rows = []
+  for row in rows:
+    if row.props['donor_hash'] in matches:
+      row.props['cluster_id'] = matches[row.props['donor_hash']]
+      clustered_rows.append(row)
+    else:
+      unclustered_rows.append(row)
+
+  return (clustered_rows, unclustered_rows)
 
 def load_records(limit):
   records = {}

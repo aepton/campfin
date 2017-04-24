@@ -77,7 +77,7 @@ def transform_data(contribs_file_path):
         missing_rows[error] += 1
         continue
 
-      if len(rows_pending_cluster) < DYNAMODB_READ_BATCH_SIZE:
+      if len(rows_pending_cluster) < settings.DYNAMODB_READ_BATCH_SIZE:
         rows_pending_cluster.append(ocd_row)
       else:
         clustered_rows, rows_pending_cluster = deduper.batch_set_cluster_ids(rows_pending_cluster)

@@ -77,7 +77,7 @@ def batch_set_cluster_ids(rows):
   response = client.batch_get_item(
     RequestItems={
       'dedupe': {
-        'Keys': [{'donorHash': {'S': key}} for key in keys]
+        'Keys': [{'donorHash': {'S': key}} for key in set(keys)]
       }
     }
   )

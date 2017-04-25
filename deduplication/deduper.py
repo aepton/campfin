@@ -15,12 +15,11 @@ variables = [
 
 def generate_donor_hash(record):
   hashable_donor = ';'.join([
-    record['Name'] if record['Name'] else '',
-    record['Address'] if record['Address'] else '',
-    record['Employer'] if record['Employer'] else '',
-    record['Occupation'] if record['Occupation'] else ''
-  ])
-  print hashable_donor
+    record['Name'].strip() if record['Name'] else '',
+    record['Address'].strip() if record['Address'] else '',
+    record['Employer'].strip() if record['Employer'] else '',
+    record['Occupation'].strip() if record['Occupation'] else ''
+  ]).upper()
 
   return uuid.uuid5(uuid.NAMESPACE_OID, hashable_donor).hex
 
@@ -108,7 +107,7 @@ def load_records(limit):
 
   seen_donor_hashes = set()
 
-  with open('/Users/abraham.epton/Downloads/WA_contributions__to_and_from.csv') as fh:
+  with open('/Users/abraham.epton/Downloads/WA_contributions__to_and_from.csv.current') as fh:
     reader = DictReader(fh)
     for row in reader:
       record = {
@@ -196,9 +195,9 @@ def store_donor_cluster_map_in_dynamodb():
 
 if __name__ == '__main__':
   #train_dedupe()
-  #cluster_records()
+  cluster_records()
   #create_dynamodb_table()
-  #store_donor_cluster_map_in_dynamodb()
+  store_donor_cluster_map_in_dynamodb()
   record = {
     'Name': "KLEIN, LYN",
     'Employer': 'SELF',

@@ -89,7 +89,7 @@ def batch_set_cluster_ids(rows):
 
   matches = {}
   for key in response['Responses']['dedupe']:
-    matches[key['donorHash']] = key['clusterID']
+    matches[key['donorHash']['S']] = key['clusterID']['S']
 
   clustered_rows = []
   unclustered_rows = []

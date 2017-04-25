@@ -1,5 +1,6 @@
 import boto3
 import dedupe
+import logging
 import uuid
 
 from csv import DictReader, DictWriter
@@ -19,6 +20,7 @@ def generate_donor_hash(record):
     record['Employer'] if record['Employer'] else '',
     record['Occupation'] if record['Occupation'] else ''
   ])
+  print hashable_donor
 
   return uuid.uuid5(uuid.NAMESPACE_OID, hashable_donor).hex
 
@@ -80,6 +82,11 @@ def batch_set_cluster_ids(rows):
       }
     }
   )
+
+  logging.info('Found %d and missed %d from %d keys' % (
+    len(response['Responses'].get('dedupe', [])),
+    len(response['UnprocessedKeys'].get('dedupe', [])),
+    len(keys)))
 
   matches = {}
   for key in response['Responses']['dedupe']:
@@ -191,4 +198,28 @@ if __name__ == '__main__':
   #train_dedupe()
   #cluster_records()
   #create_dynamodb_table()
-  store_donor_cluster_map_in_dynamodb()
+  #store_donor_cluster_map_in_dynamodb()
+  record = {
+    'Name': "KLEIN, LYN",
+    'Employer': 'SELF',
+    'Occupation': 'CLERICAL',
+    'Address': "BELLEVUE, WA, 980063156"
+  }
+  donor_hash = generate_donor_hash(record)
+  print donor_hash
+  table = get_dynamodb_table('dedupe')
+  print table.get_item(Key={'donorHash': donor_hash})
+  client = get_dynamodb_client()
+  response = client.batch_get_item(
+    RequestItems={
+      'dedupe': {
+        'Keys': [{'donorHash': {'S': donor_hash}}]
+      }
+    }
+  )
+
+  print 'Found %d and missed %d' % (
+    len(response['Responses'].get('dedupe', [])),
+    len(response['UnprocessedKeys'].get('dedupe', [])))
+  print response
+  print 'Create little tester here, run it to generate hash locally and on server, confirm they match'

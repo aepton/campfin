@@ -122,6 +122,9 @@ def transform_data(file_path, data_type, year):
         rows_pending_cluster.append(ocd_row)
       else:
         clustered_rows, rows_pending_cluster = deduper.batch_set_cluster_ids(rows_pending_cluster)
+        # For now, just throw away rows that don't find a match, even though this means we'll miss
+        # some by using eventually-consistent reads
+        rows_pending_cluster = []
 
         for clustered_row in clustered_rows:
           # Handle contributions to a particular state, and from within that state

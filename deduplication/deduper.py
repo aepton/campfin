@@ -1,6 +1,7 @@
 import boto3
 import dedupe
 import logging
+import pandas
 import uuid
 
 from csv import DictReader, DictWriter
@@ -193,32 +194,23 @@ def store_donor_cluster_map_in_dynamodb():
 
   table = set_dynamodb_throughput(table, 'WriteCapacityUnits', 1)
 
+def store_donor_cluster_map_in_s3():
+  df = pandas.read_csv('/Users/abraham.epton/Downloads/WA_contributions__to_and_from.csv.current')
+  df.to_hdf('data/WA_contribs.h5', 'table')
+  #df = pandas.read_csv('clusters.csv')
+  #df.to_hdf('data/WA_clusters.h5', 'table')
+
+def merge_donors_clusters_contribs():
+  donations_df = pandas.read_hdf('data/WA_contribs.h5', 'table')
+  print 'done loading donations'
+  clusters_df = pandas.read_hdf('data/WA_clusters.h5', 'table')
+  print 'done loading clusters'
+  donations_df.join(clusters_df.set_index(''))
+
+
 if __name__ == '__main__':
   #train_dedupe()
-  cluster_records()
+  #cluster_records()
   #create_dynamodb_table()
-  store_donor_cluster_map_in_dynamodb()
-  record = {
-    'Name': "KLEIN, LYN",
-    'Employer': 'SELF',
-    'Occupation': 'CLERICAL',
-    'Address': "BELLEVUE, WA, 980063156"
-  }
-  donor_hash = generate_donor_hash(record)
-  print donor_hash
-  table = get_dynamodb_table('dedupe')
-  print table.get_item(Key={'donorHash': donor_hash})
-  client = get_dynamodb_client()
-  response = client.batch_get_item(
-    RequestItems={
-      'dedupe': {
-        'Keys': [{'donorHash': {'S': donor_hash}}]
-      }
-    }
-  )
-
-  print 'Found %d and missed %d' % (
-    len(response['Responses'].get('dedupe', [])),
-    len(response['UnprocessedKeys'].get('dedupe', [])))
-  print response
-  print 'Create little tester here, run it to generate hash locally and on server, confirm they match'
+  #store_donor_cluster_map_in_dynamodb()
+  store_donor_cluster_map_in_s3()

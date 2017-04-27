@@ -20,14 +20,8 @@ def transform_data(contribs_file_path):
   file_handles = {}
   missing_rows = {}
 
-  table = deduper.get_dynamodb_table('dedupe')
-  table = deduper.set_dynamodb_throughput(
-    table, 'ReadCapacityUnits', settings.DYNAMODB_READ_UNITS_HEAVY)
-
   with open(contribs_file_path) as fh:
     reader = DictReader(fh)
-
-    rows_pending_cluster = []
 
     for row in reader:
       row_id = '%s-%s' % (row['ID'], row['origin'])
@@ -77,41 +71,29 @@ def transform_data(contribs_file_path):
         missing_rows[error] += 1
         continue
 
-      if len(rows_pending_cluster) < settings.DYNAMODB_READ_BATCH_SIZE:
-        rows_pending_cluster.append(ocd_row)
-      else:
-        clustered_rows, rows_pending_cluster = deduper.batch_set_cluster_ids(rows_pending_cluster)
-        # For now, just throw away rows that don't find a match, even though this means we'll miss
-        # some by using eventually-consistent reads
-        rows_pending_cluster = []
+      path = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
 
-        for clustered_row in clustered_rows:
-          path = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
+      if path not in file_handles:
+        try:
+          os.makedirs(settings.OCD_DIRECTORY)
+        except OSError as exception:
+          if exception.errno != errno.EEXIST:
+            raise
 
-          if path not in file_handles:
-            try:
-              os.makedirs(settings.OCD_DIRECTORY)
-            except OSError as exception:
-              if exception.errno != errno.EEXIST:
-                raise
+        if not os.path.exists(path):
+          with open(path, 'w+') as fh:
+            writer = DictWriter(fh, TRANSACTION_CSV_HEADER)
+            writer.writeheader()
+            fh.close()
 
-            if not os.path.exists(path):
-              with open(path, 'w+') as fh:
-                writer = DictWriter(fh, TRANSACTION_CSV_HEADER)
-                writer.writeheader()
-                fh.close()
+        file_handles[path] = open(path, 'a')
 
-            file_handles[path] = open(path, 'a')
+      file_handles[path].write(ocd_row.to_csv_row())
 
-          file_handles[path].write(clustered_row.to_csv_row())
-
-          counter += 1
-          if counter % 1000000 == 0:
-            logging.info('Processed %s' % locale.format('%d', counter, grouping=True))
+      counter += 1
+      if counter % 1000000 == 0:
+        logging.info('Processed %s' % locale.format('%d', counter, grouping=True))
     logging.info('Finished processing with %s' % locale.format('%d', counter, grouping=True))
-
-  table = deduper.set_dynamodb_throughput(
-    table, 'ReadCapacityUnits', settings.DYNAMODB_READ_UNITS_MINIMAL)
 
   logging.info('Errors:')
   for error in missing_rows:

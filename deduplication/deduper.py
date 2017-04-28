@@ -5,6 +5,7 @@ import pandas
 import uuid
 
 from csv import DictReader, DictWriter
+from datetime import datetime
 from dedupe import Dedupe, StaticDedupe, canonicalize
 
 variables = [
@@ -115,7 +116,8 @@ def load_records(limit):
         'Name': row['sender__person__name'] if row['sender__person__name'] else None,
         'Address': row['sender__person__location'] if row['sender__person__location'] else None,
         'Employer': row['sender__person__employer'] if row['sender__person__employer'] else None,
-        'Occupation': row['sender__person__occupation'] if row['sender__person__occupation'] else None
+        'Occupation': (row['sender__person__occupation'] if row['sender__person__occupation'] else
+          None)
       }
       donor_hash = generate_donor_hash(record)
       if donor_hash not in seen_donor_hashes:
@@ -132,18 +134,24 @@ def train_dedupe():
   deduper = Dedupe(variables)
   sample = deduper.sample(records)
 
+  try:
+    with open('data/training.json') as fh:
+      deduper.readTraining(fh)
+  except:
+    pass
+
   dedupe.consoleLabel(deduper)
 
   deduper.train()
 
-  with open('training.json', 'w+') as fh:
+  with open('data/training.json', 'w+') as fh:
     deduper.writeTraining(fh)
 
-  with open('settings.dedupe', 'wb') as fh:
+  with open('data/settings.dedupe', 'wb') as fh:
     deduper.writeSettings(fh)
 
 def cluster_records():
-  with open('settings.dedupe') as fh:
+  with open('data/settings.dedupe') as fh:
     deduper = StaticDedupe(fh)
 
   records = load_records(-1)
@@ -164,14 +172,13 @@ def cluster_records():
   """
   duplicates = deduper.match(records, threshold)
 
-  with open('clusters.csv', 'w+') as fh:
-    writer = DictWriter(fh, ['objectID', 'clusterID', 'donorHash'])
+  with open('data/clusters.csv', 'w+') as fh:
+    writer = DictWriter(fh, ['clusterID', 'donorHash'])
     writer.writeheader()
 
     for dupe in duplicates:
       for contrib in dupe[0]:
         writer.writerow({
-          'objectID': contrib,
           'clusterID': dupe[0][0],
           'donorHash': generate_donor_hash(records[contrib])
         })
@@ -180,7 +187,7 @@ def store_donor_cluster_map_in_dynamodb():
   table = get_dynamodb_table('dedupe')
   table = set_dynamodb_throughput(table, 'WriteCapacityUnits', 100)
 
-  with open('clusters.csv') as fh:
+  with open('data/clusters.csv') as fh:
     reader = DictReader(fh)
 
     with table.batch_writer() as batch:
@@ -201,16 +208,22 @@ def store_donor_cluster_map_in_s3():
   #df.to_hdf('data/WA_clusters.h5', 'table')
 
 def merge_donors_clusters_contribs():
+  print 'starting', datetime.now().isoformat()
   donations_df = pandas.read_hdf('data/WA_contribs.h5', 'table')
-  print 'done loading donations'
+  print 'done loading donations', datetime.now().isoformat()
+  donations_df['amount__value'] = donations_df['amount__value'].map(lambda x: x.replace('$', ''))
+  print 'done processing column'
   clusters_df = pandas.read_hdf('data/WA_clusters.h5', 'table')
-  print 'done loading clusters'
-  donations_df.join(clusters_df.set_index(''))
+  print 'done loading clusters', datetime.now().isoformat()
+  donations_df.set_index('id').join(clusters_df.set_index('objectID')).to_csv(
+    'data/combined_WA.csv')
+  print 'done joining', datetime.now().isoformat()
 
 
 if __name__ == '__main__':
-  #train_dedupe()
+  train_dedupe()
   #cluster_records()
   #create_dynamodb_table()
   #store_donor_cluster_map_in_dynamodb()
-  store_donor_cluster_map_in_s3()
+  #store_donor_cluster_map_in_s3()
+  #merge_donors_clusters_contribs()

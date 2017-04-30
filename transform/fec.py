@@ -10,6 +10,7 @@ from datetime import datetime
 from decimal import *
 from deduplication import deduper
 from settings import settings
+from utilities import utils
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -58,6 +59,7 @@ def transform_data(file_path, data_type, year):
   committees = load_committee_metadata(year)
 
   # Now load and transform the data we were asked to transform
+  alert_filters = utils.load_alert_filters()
   counter = 0
   missing_rows = {}
   file_handles = {}
@@ -103,7 +105,8 @@ def transform_data(file_path, data_type, year):
           filing__recipient='FEC',
           date=receipt_date.strftime(settings.OCD_DATETIME_FMT),
           description=row['MEMO_CD'],
-          note=row['MEMO_TEXT']
+          note=row['MEMO_TEXT'],
+          alert_filters=alert_filters
         )
       except Exception, e:
         error = 'ocd loading error: %s' % e

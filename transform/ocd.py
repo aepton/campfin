@@ -1,5 +1,8 @@
+import base64
 import boto3
+import json
 import logging
+import os
 import uuid
 
 from csv import DictReader, DictWriter
@@ -7,6 +10,7 @@ from decimal import *
 from deduplication import deduper
 from cStringIO import StringIO
 from settings import settings
+from utilities import utils
 
 TRANSACTION_COLUMNS = [
   {
@@ -159,8 +163,13 @@ class Transaction(object):
       date='',
       description='',
       note='',
-      csv_header=TRANSACTION_CSV_HEADER):
+      csv_header=TRANSACTION_CSV_HEADER,
+      alert_file_handles={},
+      alert_filters=[]):
 
+    self.alert_emails = set()
+    self.alert_file_handles = alert_file_handles
+    self.alert_filters = alert_filters
     self.csv_header = csv_header
 
     self.props = {
@@ -191,6 +200,24 @@ class Transaction(object):
     }
 
     self.set_donor_hash()
+    self.process_alert_filters()
+    if self.alert_emails:
+      self.update_alert_files()
+
+  def process_alert_filters(self):
+    if not self.alert_filters:
+      self.alert_filters = utils.load_alert_filters()
+
+    for af in self.alert_filters['alerts']:
+      for key in af:
+        for val in af[key]:
+          if self.props[key] == val:
+            [self.alert_emails.add(em) for em in af['emails']]
+
+  def update_alert_files(self):
+    for email in self.alert_emails:
+      if email in self.alert_filters['filehandles']:
+        self.alert_filters['filehandles'].writerow(self.to_csv_row())
 
   def set_donor_hash(self):
     record = {

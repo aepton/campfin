@@ -10,12 +10,14 @@ from decimal import *
 from deduplication import deduper
 from ocd import *
 from settings import settings
+from utilities import utils
 
 locale.setlocale(locale.LC_ALL, '')
 
 jurisdiction = 'WA'
 
 def transform_data(contribs_file_path):
+  alert_filters = utils.load_alert_filters()
   counter = 0
   file_handles = {}
   missing_rows = {}
@@ -62,7 +64,8 @@ def transform_data(contribs_file_path):
           filing__recipient='PDC',
           date=receipt_date.strftime(settings.OCD_DATETIME_FMT),
           description=row['description'],
-          note=row['memo']
+          note=row['memo'],
+          alert_filters=alert_filters
         )
       except Exception, e:
         error = 'ocd loading error: %s' % e

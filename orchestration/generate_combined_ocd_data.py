@@ -67,7 +67,7 @@ def upload_to_socrata():
 
 def upload_to_s3():
   local_path = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
-  utils.write_to_s3(settings.S3_BUCKET, 'WA.csv', local_path)
+  utils.write_to_s3('WA.csv', local_path)
 
 def setup_logging(log_name):
   logger.basicConfig(

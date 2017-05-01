@@ -59,7 +59,7 @@ def transform_data(file_path, data_type, year):
   committees = load_committee_metadata(year)
 
   # Now load and transform the data we were asked to transform
-  alert_filters = utils.load_alert_filters(TRANSACTION_CSV_HEADER)
+  alert_filters = utils.load_alert_filters(ocd.TRANSACTION_CSV_HEADER)
   counter = 0
   missing_rows = {}
   file_handles = {}

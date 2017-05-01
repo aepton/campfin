@@ -49,7 +49,7 @@ def load_from_s3(s3_path, bucket=settings.S3_BUCKET, encoding='utf-8'):
   session = boto3.Session(profile_name='abe')
   s3 = session.resource('s3')
   obj = s3.Object(bucket, s3_path)
-  return obj.get()['Body']
+  return obj.get()['Body'].read()
 
 def get_temp_filehandle_for_reading_s3_obj(s3_path, bucket=settings.S3_BUCKET, encoding='utf-8'):
   fh = tempfile.NamedTemporaryFile()

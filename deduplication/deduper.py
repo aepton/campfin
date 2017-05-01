@@ -123,7 +123,7 @@ def load_records(limit):
   records = {}
 
   seen_donor_hashes = set()
-  fh = utils.get_temp_filehandle_for_reading_s3_obj('WA.csv')
+  fh = utils.load_from_s3('WA.csv')
   reader = DictReader(fh)
   for row in reader:
     record = {

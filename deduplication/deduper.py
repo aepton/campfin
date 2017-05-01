@@ -123,7 +123,7 @@ def load_records(limit):
   records = {}
 
   seen_donor_hashes = set()
-  fh = StringIO(utils.load_from_s3('WA.csv'))
+  fh = StringIO(utils.get_temp_filehandle_for_reading_s3_obj('WA.csv'))
   reader = DictReader(fh)
   for row in reader:
     record = {
@@ -179,7 +179,7 @@ def cluster_records():
 
   #threshold = deduper.threshold(records, recall_weight=.5)
   threshold = 0.799195
-  print 'Setting threshold', threshold
+  logger.info('Setting cluster threshold: %s' threshold)
 
   """
   for field in deduper.blocker.index_fields:

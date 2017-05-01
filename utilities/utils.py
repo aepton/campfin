@@ -45,16 +45,25 @@ def write_to_s3(s3_path, local_path=None, contents=None, bucket=settings.S3_BUCK
     source = StringIO(contents)
   s3.Object(bucket, s3_path).put(Body=source)
 
-def load_from_s3(s3_path, bucket=settings.S3_BUCKET, encoding='utf-8'):
+def load_from_s3_base(s3_path, bucket, encoding):
   session = boto3.Session(profile_name='abe')
   s3 = session.resource('s3')
   obj = s3.Object(bucket, s3_path)
-  return obj.get()['Body'].read()
+  return obj.get()
+
+def load_from_s3(s3_path, bucket=settings.S3_BUCKET, encoding='utf-8'):
+  return load_from_s3_base(s3_path, bucket, encoding)['Body'].read()
 
 def get_temp_filehandle_for_reading_s3_obj(s3_path, bucket=settings.S3_BUCKET, encoding='utf-8'):
   fh = tempfile.NamedTemporaryFile()
   logger.info('Created temp file %s' % fh.name)
-  for line in load_from_s3(s3_path, bucket, encoding):
-    fh.write(line)
+
+  def generate(result):
+   for chunk in iter(lambda: result['Body'].read(settings.STREAMING_CHUNK_SIZE), b''):
+      yield chunk
+
+  for chunk in generate(load_from_s3_base(s3_path, bucket, encoding))
+    fh.write(chunk)
+
   fh.seek(0)
   return fh

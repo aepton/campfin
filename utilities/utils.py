@@ -9,9 +9,8 @@ from csv import DictReader, DictWriter
 from decimal import *
 from cStringIO import StringIO
 from settings import settings
-from transform.ocd import TRANSACTION_CSV_HEADER
 
-def load_alert_filehandles(alerts):
+def load_alert_filehandles(alerts, header):
   fhs = {}
   for alert in alerts:
     for email in alert['emails']:
@@ -19,13 +18,13 @@ def load_alert_filehandles(alerts):
         fname = '%s.csv' % base64.urlsafe_b64encode(email)
         fhs[email] = DictWriter(
           open(os.path.join(settings.DATA_DIRECTORY, 'alerts', fname), 'w+'),
-          TRANSACTION_CSV_HEADER)
+          header)
         fhs[email].writeheader()
   return fhs
 
-def load_alert_filters():
+def load_alert_filters(header):
   with open(os.path.join(settings.DATA_DIRECTORY, 'alerts.json')) as fh:
     filters = {}
     filters['alerts'] = json.loads(fh.read())
-    filters['filehandles'] = load_alert_filters(filters['alerts'])
+    filters['filehandles'] = load_alert_filehandles(filters['alerts'], header)
     return filters

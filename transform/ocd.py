@@ -206,7 +206,7 @@ class Transaction(object):
 
   def process_alert_filters(self):
     if not self.alert_filters:
-      self.alert_filters = utils.load_alert_filters()
+      self.alert_filters = utils.load_alert_filters(TRANSACTION_CSV_HEADER)
 
     for af in self.alert_filters['alerts']:
       for key in af:

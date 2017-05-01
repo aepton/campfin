@@ -25,6 +25,10 @@ def load_alert_filehandles(alerts, header):
 def load_alert_filters(header):
   with open(os.path.join(settings.DATA_DIRECTORY, 'alerts.json')) as fh:
     filters = {}
-    filters['alerts'] = json.loads(fh.read())
+    try:
+      filters['alerts'] = json.loads(fh.read())
+    except Exception, e:
+      logging.info('No alert filters loaded: %s' % s)
+      filters['alerts'] = []
     filters['filehandles'] = load_alert_filehandles(filters['alerts'], header)
     return filters

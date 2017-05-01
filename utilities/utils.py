@@ -62,7 +62,7 @@ def get_temp_filehandle_for_reading_s3_obj(s3_path, bucket=settings.S3_BUCKET, e
    for chunk in iter(lambda: result['Body'].read(settings.STREAMING_CHUNK_SIZE), b''):
       yield chunk
 
-  for chunk in generate(load_from_s3_base(s3_path, bucket, encoding))
+  for chunk in generate(load_from_s3_base(s3_path, bucket, encoding)):
     fh.write(chunk)
 
   fh.seek(0)

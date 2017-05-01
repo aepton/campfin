@@ -5,4 +5,4 @@ cd $APP_PATH
 
 source /home/ubuntu/.virtualenvs/campfin/bin/activate
 
-python -m orchestration.generate_combined_ocd_data > $APP_PATH/logs/rebuild.log
+python -m orchestration.generate_combined_ocd_data >> $APP_PATH/logs/rebuild.log

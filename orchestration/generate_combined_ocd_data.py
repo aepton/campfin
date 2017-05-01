@@ -1,4 +1,7 @@
 import logging
+
+setup_logging('rebuild')
+
 import os
 import shutil
 import subprocess
@@ -77,7 +80,6 @@ def setup_logging(log_name):
     level=logging.INFO)
 
 def orchestrate():
-  setup_logging('rebuild')
   logger.info('Starting cleanup')
   cleanup_data_dirs()
 

@@ -10,6 +10,7 @@ from fetch import wa as wa_fetch
 from settings import settings
 from transform import fec as fec_transform
 from transform import wa as wa_transform
+from utilities import utils
 
 YEARS = ['2018', '2016', '2014', '2012', '2010', '2008', '2006', '2004']
 DATA_URLS = {}
@@ -64,6 +65,10 @@ def upload_to_socrata():
     shell=True,
     stdout=subprocess.PIPE).stdout.read())
 
+def upload_to_s3():
+  local_path = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
+  utils.write_to_s3(settings.S3_BUCKET, 'WA.csv', local_path)
+
 def setup_logging(log_name):
   logger.basicConfig(
     filename=os.path.join(settings.LOG_DIR, '%s.log' % log_name),
@@ -83,6 +88,7 @@ def orchestrate():
   download_and_process_wa_data()
 
   logger.info('Starting upload')
+  upload_to_s3()
   upload_to_socrata()
 
   logger.info('Done with everything')

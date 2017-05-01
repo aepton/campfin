@@ -9,7 +9,6 @@ feedparser==5.2.1
 flower==0.9.1
 future==0.16.0
 futures==3.0.5
-GDAL==1.11.5
 kombu==4.0.2
 pbr==1.10.0
 pexpect==4.2.1

@@ -5,6 +5,7 @@ import logging
 import os
 import uuid
 
+from boto3.s3.key import Key
 from csv import DictReader, DictWriter
 from decimal import *
 from cStringIO import StringIO
@@ -34,3 +35,10 @@ def load_alert_filters(header):
       filters['alerts'] = []
     filters['filehandles'] = load_alert_filehandles(filters['alerts'], header)
     return filters
+
+def write_to_s3(bucket, s3_path, local_path):
+  session = boto3.Session(profile_name='abe')
+  s3 = session.resource('s3')
+  key = Key(s3.get_bucket(bucket))
+  key.key = s3_path
+  key.set_contents_from_filename(local_path)

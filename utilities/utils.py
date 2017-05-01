@@ -3,6 +3,7 @@ import boto3
 import json
 import logging
 import os
+import tempfile
 import uuid
 
 from csv import DictReader, DictWriter
@@ -35,7 +36,25 @@ def load_alert_filters(header):
     filters['filehandles'] = load_alert_filehandles(filters['alerts'], header)
     return filters
 
-def write_to_s3(s3_path, local_path, bucket=settings.S3_BUCKET):
+def write_to_s3(s3_path, local_path=None, contents=None, bucket=settings.S3_BUCKET):
   session = boto3.Session(profile_name='abe')
   s3 = session.resource('s3')
-  s3.Object(bucket, s3_path).put(Body=open(local_path, 'rb'))
+  if local_path:
+    source = open(local_path, 'rb')
+  else:
+    source = StringIO(contents)
+  s3.Object(bucket, s3_path).put(Body=source)
+
+def load_from_s3(s3_path, bucket=settings.S3_BUCKET, encoding='utf-8'):
+  session = boto3.Session(profile_name='abe')
+  s3 = session.resource('s3')
+  obj = s3.Object(bucket, s3_path)
+  return obj.get()['Body']
+
+def get_temp_filehandle_for_reading_s3_obj(s3_path, bucket=settings.S3_BUCKET, encoding='utf-8'):
+  fh = tempfile.NamedTemporaryFile()
+  logger.info('Created temp file %s' % fh.name)
+  for line in load_from_s3(s3_path, bucket, encoding):
+    fh.write(line)
+  fh.seek(0)
+  return fh

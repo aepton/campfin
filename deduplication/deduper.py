@@ -1,12 +1,25 @@
+import logging
+import os
+
+from settings import settings
+
+# Setting this up before other imports so everything logs correctly
+logging.basicConfig(
+  filename=os.path.join(settings.LOG_DIR, 'dedupe.log'),
+  filemode='a',
+  format='%(levelname)s %(asctime)s %(filename)s:%(lineno)d in %(funcName)s: %(message)s',
+  level=logging.INFO)
+
 import boto3
 import dedupe
-import logging
 import pandas
 import uuid
 
+from cStringIO import StringIO
 from csv import DictReader, DictWriter
 from datetime import datetime
 from dedupe import Dedupe, StaticDedupe, canonicalize
+from utilities import utils
 
 logger = logging.getLogger(__name__)
 
@@ -110,24 +123,25 @@ def load_records(limit):
   records = {}
 
   seen_donor_hashes = set()
-
-  with open('/Users/abraham.epton/Downloads/WA_contributions__to_and_from.csv.current') as fh:
-    reader = DictReader(fh)
-    for row in reader:
-      record = {
-        'Name': row['sender__person__name'] if row['sender__person__name'] else None,
-        'Address': row['sender__person__location'] if row['sender__person__location'] else None,
-        'Employer': row['sender__person__employer'] if row['sender__person__employer'] else None,
-        'Occupation': (row['sender__person__occupation'] if row['sender__person__occupation'] else
-          None)
-      }
-      donor_hash = generate_donor_hash(record)
-      if donor_hash not in seen_donor_hashes:
-        seen_donor_hashes.add(donor_hash)
-        records[row['id']] = record
-        if len(records) >= limit and limit != -1:
-          return records
+  fh = utils.get_temp_filehandle_for_reading_s3_obj('WA.csv')
+  reader = DictReader(fh)
+  for row in reader:
+    record = {
+      'Name': row['sender__person__name'] if row['sender__person__name'] else None,
+      'Address': row['sender__person__location'] if row['sender__person__location'] else None,
+      'Employer': row['sender__person__employer'] if row['sender__person__employer'] else None,
+      'Occupation': (row['sender__person__occupation'] if row['sender__person__occupation'] else
+        None)
+    }
+    donor_hash = generate_donor_hash(record)
+    if donor_hash not in seen_donor_hashes:
+      seen_donor_hashes.add(donor_hash)
+      records[row['id']] = record
+      if len(records) >= limit and limit != -1:
+        fh.close()
+        return records
   print 'Found %d records' % len(records)
+  fh.close()
   return records
 
 def train_dedupe():
@@ -137,8 +151,8 @@ def train_dedupe():
   sample = deduper.sample(records)
 
   try:
-    with open('data/training.json') as fh:
-      deduper.readTraining(fh)
+    fh = StringIO(utils.load_from_s3('training.json'))
+    deduper.readTraining(fh)
   except:
     pass
 
@@ -146,15 +160,20 @@ def train_dedupe():
 
   deduper.train()
 
-  with open('data/training.json', 'w+') as fh:
-    deduper.writeTraining(fh)
+  deduper = Dedupe(variables)
+  with open('data/dedupe/training.json') as fh:
+    deduper.readTraining(fh)
+  output = StringIO()
+  deduper.writeTraining(output)
+  utils.write_to_s3('training.json', contents=output.getvalue())
 
-  with open('data/settings.dedupe', 'wb') as fh:
-    deduper.writeSettings(fh)
+  output = StringIO()
+  deduper.writeSettings(output)
+  utils.write_to_s3('settings.dedupe', contents=output.getvalue())
 
 def cluster_records():
-  with open('data/settings.dedupe') as fh:
-    deduper = StaticDedupe(fh)
+  fh = StringIO(utils.load_from_s3('settings.dedupe'))
+  deduper = StaticDedupe(fh)
 
   records = load_records(-1)
 
@@ -184,6 +203,7 @@ def cluster_records():
           'clusterID': dupe[0][0],
           'donorHash': generate_donor_hash(records[contrib])
         })
+  utils.write_to_s3('clusters.csv', local_path='data/clusters.csv')
 
 def store_donor_cluster_map_in_dynamodb():
   table = get_dynamodb_table('dedupe')

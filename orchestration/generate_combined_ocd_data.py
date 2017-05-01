@@ -1,8 +1,15 @@
 import logging
-
-setup_logging('rebuild')
-
 import os
+
+from settings import settings
+
+# Setting this up before other imports so everything logs correctly
+logging.basicConfig(
+  filename=os.path.join(settings.LOG_DIR, 'rebuild.log'),
+  filemode='a',
+  format='%(levelname)s %(asctime)s %(filename)s:%(lineno)d in %(funcName)s: %(message)s',
+  level=logging.INFO)
+
 import shutil
 import subprocess
 import zipfile
@@ -10,7 +17,6 @@ import zipfile
 from datetime import datetime
 from fetch import fec as fec_fetch
 from fetch import wa as wa_fetch
-from settings import settings
 from transform import fec as fec_transform
 from transform import wa as wa_transform
 from utilities import utils
@@ -70,14 +76,7 @@ def upload_to_socrata():
 
 def upload_to_s3():
   local_path = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
-  utils.write_to_s3('WA.csv', local_path)
-
-def setup_logging(log_name):
-  logging.basicConfig(
-    filename=os.path.join(settings.LOG_DIR, '%s.log' % log_name),
-    filemode='a',
-    format='%(levelname)s %(asctime)s %(filename)s:%(lineno)d in %(funcName)s: %(message)s',
-    level=logging.INFO)
+  utils.write_to_s3('WA.csv', local_path=local_path)
 
 def orchestrate():
   logger.info('Starting cleanup')

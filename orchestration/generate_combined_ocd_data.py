@@ -70,7 +70,7 @@ def upload_to_s3():
   utils.write_to_s3('WA.csv', local_path)
 
 def setup_logging(log_name):
-  logger.basicConfig(
+  logging.basicConfig(
     filename=os.path.join(settings.LOG_DIR, '%s.log' % log_name),
     filemode='a',
     format='%(levelname)s %(asctime)s %(filename)s:%(lineno)d in %(funcName)s: %(message)s',

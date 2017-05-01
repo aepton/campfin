@@ -9,7 +9,7 @@ from csv import DictReader, DictWriter
 from decimal import *
 from cStringIO import StringIO
 from settings import settings
-from transform import ocd
+from transform.ocd import TRANSACTION_CSV_HEADER
 
 def load_alert_filehandles(alerts):
   fhs = {}
@@ -19,7 +19,7 @@ def load_alert_filehandles(alerts):
         fname = '%s.csv' % base64.urlsafe_b64encode(email)
         fhs[email] = DictWriter(
           open(os.path.join(settings.DATA_DIRECTORY, 'alerts', fname), 'w+'),
-          ocd.TRANSACTION_CSV_HEADER)
+          TRANSACTION_CSV_HEADER)
         fhs[email].writeheader()
   return fhs
 

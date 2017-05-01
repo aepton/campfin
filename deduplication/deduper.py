@@ -179,7 +179,7 @@ def cluster_records():
 
   #threshold = deduper.threshold(records, recall_weight=.5)
   threshold = 0.799195
-  logger.info('Setting cluster threshold: %s' threshold)
+  logger.info('Setting cluster threshold: %s' % threshold)
 
   """
   for field in deduper.blocker.index_fields:

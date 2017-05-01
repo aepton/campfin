@@ -8,5 +8,5 @@ source /home/ubuntu/envs/campfin/bin/activate
 
 touch $LOG_PATH
 echo "Starting at `date`"
-time python -m deduplication.deduper >> $LOG_PATH
+time python -m deduplication.cluster >> $LOG_PATH
 echo "Ending at `date`"

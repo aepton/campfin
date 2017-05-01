@@ -13,6 +13,7 @@ from settings import settings
 from utilities import utils
 
 locale.setlocale(locale.LC_ALL, '')
+logger = logging.getLogger(__name__)
 
 jurisdiction = 'FEC'
 
@@ -118,7 +119,7 @@ def transform_data(file_path, data_type, year):
       # Handle contributions to a particular state, and from within that state
       for state in set([committees[row['CMTE_ID']]['state'], row['STATE']]):
         if state.find('/') != -1:
-          logging.warning('Odd, found slash in state for %s' % row)
+          logger.warning('Odd, found slash in state for %s' % row)
           state = state.replace('/', '')
         if state not in settings.STATES_IMPLEMENTED:
           continue
@@ -143,9 +144,9 @@ def transform_data(file_path, data_type, year):
 
       counter += 1
       if counter % 1000000 == 0:
-        logging.info('Processed %s' % locale.format('%d', counter, grouping=True))
-    logging.info('Finished processing with %s' % locale.format('%d', counter, grouping=True))
+        logger.info('Processed %s' % locale.format('%d', counter, grouping=True))
+    logger.info('Finished processing with %s' % locale.format('%d', counter, grouping=True))
 
-  logging.info('Errors:')
+  logger.info('Errors:')
   for error in missing_rows:
-    logging.info('%s: %d' % (error, missing_rows[error]))
+    logger.info('%s: %d' % (error, missing_rows[error]))

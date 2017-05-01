@@ -13,6 +13,7 @@ from settings import settings
 from utilities import utils
 
 locale.setlocale(locale.LC_ALL, '')
+logger = logging.getLogger(__name__)
 
 jurisdiction = 'WA'
 
@@ -95,12 +96,12 @@ def transform_data(contribs_file_path):
 
       counter += 1
       if counter % 1000000 == 0:
-        logging.info('Processed %s' % locale.format('%d', counter, grouping=True))
-    logging.info('Finished processing with %s' % locale.format('%d', counter, grouping=True))
+        logger.info('Processed %s' % locale.format('%d', counter, grouping=True))
+    logger.info('Finished processing with %s' % locale.format('%d', counter, grouping=True))
 
-  logging.info('Errors:')
+  logger.info('Errors:')
   for error in missing_rows:
-    logging.info('%s: %d' % (error, missing_rows[error]))
+    logger.info('%s: %d' % (error, missing_rows[error]))
 
 if __name__ == '__main__':
   transform_data()

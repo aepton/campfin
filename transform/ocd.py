@@ -12,6 +12,8 @@ from cStringIO import StringIO
 from settings import settings
 from utilities import utils
 
+logger = logging.getLogger(__name__)
+
 TRANSACTION_COLUMNS = [
   {
     'name': 'Id',

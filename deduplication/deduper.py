@@ -8,6 +8,8 @@ from csv import DictReader, DictWriter
 from datetime import datetime
 from dedupe import Dedupe, StaticDedupe, canonicalize
 
+logger = logging.getLogger(__name__)
+
 variables = [
   {'field': 'Name', 'type': 'String'},
   {'field': 'Address', 'type': 'String', 'has missing': True},
@@ -84,7 +86,7 @@ def batch_set_cluster_ids(rows):
     }
   )
 
-  logging.info('Found %d and missed %d from %d keys' % (
+  logger.info('Found %d and missed %d from %d keys' % (
     len(response['Responses'].get('dedupe', [])),
     len(response['UnprocessedKeys'].get('dedupe', [])),
     len(keys)))

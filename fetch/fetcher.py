@@ -8,6 +8,8 @@ import urllib2
 from csv import DictReader, DictWriter
 from settings import settings
 
+logger = logging.getLogger(__name__)
+
 class Fetcher(object):
   def __init__(
       self,
@@ -35,10 +37,10 @@ class Fetcher(object):
     if not self.retry_attempts or not self.download_url or not self.file_path:
       return
 
-    logging.info('Writing %s' % self.file_path)
+    logger.info('Writing %s' % self.file_path)
     with open(self.file_path, 'w+') as file_handle:
       try:
-        logging.info('Fetching %s' % self.download_url)
+        logger.info('Fetching %s' % self.download_url)
         self.retry_attempts -= 1
         self.error_counter = 0
         self.success_counter = 0
@@ -53,16 +55,16 @@ class Fetcher(object):
               file_handle.write('%s%s' % (unicode(line, errors='ignore'), os.linesep))
               self.success_counter += 1
             except Exception, e:
-              logging.warning(e)
+              logger.warning(e)
               self.error_counter += 1
 
       except Exception, e:
-        logging.warning('Error downloading %s: %s' % (self.download_url, e))
+        logger.warning('Error downloading %s: %s' % (self.download_url, e))
         if self.retry_attempts:
-          logging.info('Retrying %d more times' % self.retry_attempts)
+          logger.info('Retrying %d more times' % self.retry_attempts)
           self.download_data()
 
-      logging.info(
+      logger.info(
         'Finished with %d bad lines and %d successful ones' % (
           self.error_counter, self.success_counter))
 
@@ -70,10 +72,10 @@ class Fetcher(object):
     if not self.retry_attempts or not self.download_url or not self.file_path:
       return
 
-    logging.info('Writing %s' % self.file_path)
+    logger.info('Writing %s' % self.file_path)
     with open(self.file_path, 'wb') as fh:
       try:
-        logging.info('Fetching %s' % self.download_url)
+        logger.info('Fetching %s' % self.download_url)
         self.retry_attempts -= 1
 
         c = pycurl.Curl()
@@ -83,19 +85,19 @@ class Fetcher(object):
         c.close()
 
       except Exception, e:
-        logging.warning('Error downloading %s: %s' % (self.download_url, e))
+        logger.warning('Error downloading %s: %s' % (self.download_url, e))
         if self.retry_attempts:
-          logging.info('Retrying %d more times' % self.retry_attempts)
+          logger.info('Retrying %d more times' % self.retry_attempts)
           self.download_data_pycurl()
 
   def download_data_ftp(self):
     if not self.retry_attempts or not self.download_url or not self.file_path:
       return
 
-    logging.info('Writing %s' % self.file_path)
+    logger.info('Writing %s' % self.file_path)
     with open(self.file_path, 'w+') as file_handle:
       try:
-        logging.info('Fetching %s' % self.download_url)
+        logger.info('Fetching %s' % self.download_url)
         self.retry_attempts -= 1
 
         request = urllib2.Request(self.download_url)
@@ -103,9 +105,9 @@ class Fetcher(object):
         file_handle.write(self.download_response.read())
 
       except Exception, e:
-        logging.warning('Error downloading %s: %s' % (self.download_url, e))
+        logger.warning('Error downloading %s: %s' % (self.download_url, e))
         if self.retry_attempts:
-          logging.info('Retrying %d more times' % self.retry_attempts)
+          logger.info('Retrying %d more times' % self.retry_attempts)
           self.download_data_ftp()
 
   def setup_file(self):

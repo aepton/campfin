@@ -25,6 +25,8 @@ for YEAR in YEARS:
     ('contributions', 'ftp://ftp.fec.gov/FEC/%s/indiv%s.zip' % (YEAR, CYCLE))
   ]
 
+logger = logging.getLogger(__name__)
+
 def cleanup_data_dirs():
   for state in settings.STATES_IMPLEMENTED:
     try:
@@ -36,7 +38,7 @@ def download_and_process_fec_data():
   fec_fetch.download_headers()
 
   for year in YEARS:
-    logging.info('Fetching FEC year %s' % year)
+    logger.info('Fetching FEC year %s' % year)
     for url_type, url in DATA_URLS[year]:
       file_path = os.path.join(fec_fetch.download_data(url, url_type, year), 'itcont.txt')
       if url_type == 'contributions':
@@ -56,14 +58,14 @@ def upload_to_socrata():
   control = os.path.join(home, 'control.json')
   csv = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
   dataset = 'rvjy-yeu3'
-  logging.info(subprocess.Popen(
+  logger.info(subprocess.Popen(
     "java -jar %s -c %s -f %s -h true -m upsert -ph true -cf %s -i %s" % (
       datasync, config, csv, control, dataset),
     shell=True,
     stdout=subprocess.PIPE).stdout.read())
 
 def setup_logging(log_name):
-  logging.basicConfig(
+  logger.basicConfig(
     filename=os.path.join(settings.LOG_DIR, '%s.log' % log_name),
     filemode='a',
     format='%(levelname)s %(asctime)s %(filename)s:%(lineno)d in %(funcName)s: %(message)s',
@@ -71,19 +73,19 @@ def setup_logging(log_name):
 
 def orchestrate():
   setup_logging('rebuild')
-  logging.info('Starting cleanup')
+  logger.info('Starting cleanup')
   cleanup_data_dirs()
 
-  logging.info('Starting FEC')
+  logger.info('Starting FEC')
   download_and_process_fec_data()
 
-  logging.info('Starting WA')
+  logger.info('Starting WA')
   download_and_process_wa_data()
 
-  logging.info('Starting upload')
+  logger.info('Starting upload')
   upload_to_socrata()
 
-  logging.info('Done with everything')
+  logger.info('Done with everything')
   print 'testing logging to file'
 
 if __name__ == '__main__':

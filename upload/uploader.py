@@ -10,6 +10,8 @@ from transform.ocd import *
 from csv import DictReader, DictWriter
 from sodapy import Socrata
 
+logger = logging.getLogger(__name__)
+
 ROOT_DIRECTORY = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 DATA_DIRECTORY = os.path.join(ROOT_DIRECTORY, 'data')
 OCD_DIRECTORY = os.path.join(DATA_DIRECTORY, 'OCD')
@@ -56,10 +58,10 @@ def upload_file(state, auth):
   try:
     file_id = r.json()['fileId']
   except:
-    logging.warning('Error scanning file for %s: %s' % (state, r.text))
+    logger.warning('Error scanning file for %s: %s' % (state, r.text))
     return
 
-  logging.info('Posted file, got fileId %s' % file_id)
+  logger.info('Posted file, got fileId %s' % file_id)
 
   r = requests.post(
     'https://abrahamepton.demo.socrata.com/imports2.json?ingress_strategy=nbe&nbe=true',
@@ -76,9 +78,9 @@ def upload_file(state, auth):
     })
 
   try:
-    logging.info('Got status code %s for dataset %s' % (r.status_code, r.json()['id']))
+    logger.info('Got status code %s for dataset %s' % (r.status_code, r.json()['id']))
   except KeyError:
-    logging.warning('Error uploading; got %s' % r.text)
+    logger.warning('Error uploading; got %s' % r.text)
     return
 
   client = Socrata(
@@ -99,5 +101,5 @@ def upload_file(state, auth):
 if __name__ == '__main__':
   auth = get_socrata_auth()
   for state in ENABLED_STATES:
-    logging.info('Uploading %s' % (state))
+    logger.info('Uploading %s' % (state))
     upload_file(state, auth)

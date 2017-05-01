@@ -12,9 +12,11 @@ HEADER_URLS = {
   'contributions_header': 'http://www.fec.gov/finance/disclosure/metadata/indiv_header_file.csv'
 }
 
+logger = logging.getLogger(__name__)
+
 def download_headers():
   for header_url_type, header_url in HEADER_URLS.items():
-    logging.info('Downloading header: %s' % header_url)
+    logger.info('Downloading header: %s' % header_url)
     client = Fetcher(
       download_url=header_url,
       state=STATE,
@@ -28,7 +30,7 @@ def download_data(url, url_type, year, download_headers=False):
   if download_headers:
     download_headers()
 
-  logging.info('Downloading %s' % url)
+  logger.info('Downloading %s' % url)
   file_type = 'zip'
   client = Fetcher(
     download_url=url,
@@ -62,4 +64,4 @@ def cleanup_unnecessary_contribution_files(year):
         'contributions',
         'by_date'))
   except OSError:
-    logging.warning('No by_date for %s' % year)
+    logger.warning('No by_date for %s' % year)

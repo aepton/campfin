@@ -10,6 +10,8 @@ from decimal import *
 from cStringIO import StringIO
 from settings import settings
 
+logger = logging.getLogger(__name__)
+
 def load_alert_filehandles(alerts, header):
   fhs = {}
   for alert in alerts:
@@ -28,7 +30,7 @@ def load_alert_filters(header):
     try:
       filters['alerts'] = json.loads(fh.read())
     except Exception, e:
-      logging.info('No alert filters loaded: %s' % e)
+      logger.info('No alert filters loaded: %s' % e)
       filters['alerts'] = []
     filters['filehandles'] = load_alert_filehandles(filters['alerts'], header)
     return filters

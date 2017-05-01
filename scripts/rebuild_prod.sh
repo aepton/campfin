@@ -3,7 +3,7 @@
 APP_PATH=/home/ubuntu/code/campfin
 cd $APP_PATH
 
-source /home/ubuntu/.virtualenvs/campfin/bin/activate
+source /home/ubuntu/envs/campfin/bin/activate
 
 touch $APP_PATH/logs/rebuild.log
 echo "Starting at `date`"

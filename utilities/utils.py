@@ -28,7 +28,7 @@ def load_alert_filters(header):
     try:
       filters['alerts'] = json.loads(fh.read())
     except Exception, e:
-      logging.info('No alert filters loaded: %s' % s)
+      logging.info('No alert filters loaded: %s' % e)
       filters['alerts'] = []
     filters['filehandles'] = load_alert_filehandles(filters['alerts'], header)
     return filters

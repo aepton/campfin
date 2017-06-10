@@ -28,7 +28,7 @@ def transform_data(contribs_file_path):
 
     for row in reader:
       try:
-        row_id = '%s-%s' % (row['ID'], row['origin'])
+        row_id = '%s-%s' % (row['id'], row['origin'])
       except Exception, e:
         logger.info('Error %s loading row: %s' % (e, row))
         continue

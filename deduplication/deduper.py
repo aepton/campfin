@@ -7,7 +7,7 @@ from settings import settings
 logging.basicConfig(
   filename=os.path.join(settings.LOG_DIR, 'dedupe.log'),
   filemode='a',
-  format='%(levelname)s %(asctime)s %(filename)s:%(lineno)d in %(funcName)s: %(message)s',
+  format='%(levelname)s %(asctime)s %(pathname)s:%(lineno)d in %(funcName)s: %(message)s',
   level=logging.INFO)
 
 import boto3

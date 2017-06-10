@@ -7,7 +7,6 @@ from settings import settings
 logging.basicConfig(
   filename=os.path.join(settings.LOG_DIR, 'rebuild.log'),
   filemode='a',
-  format='%(levelname)s %(asctime)s %(filename)s:%(lineno)d in %(funcName)s: %(message)s',
   level=logging.INFO)
 
 import shutil
@@ -63,7 +62,7 @@ def download_and_process_wa_data():
 
 def upload_to_socrata():
   home = '/home/ubuntu'
-  datasync = os.path.join(home, 'DataSync-1.8.0.jar')
+  datasync = os.path.join(home, 'datasync', 'datasync-1.8.2.jar')
   config = os.path.join(home, 'config.json')
   control = os.path.join(home, 'control.json')
   csv = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
@@ -93,7 +92,6 @@ def orchestrate():
   upload_to_socrata()
 
   logger.info('Done with everything')
-  print 'testing logging to file'
 
 if __name__ == '__main__':
   orchestrate()

@@ -63,8 +63,8 @@ def download_and_process_wa_data():
 def upload_to_socrata():
   home = '/home/ubuntu'
   datasync = os.path.join(home, 'datasync', 'datasync-1.8.2.jar')
-  config = os.path.join(home, 'config.json')
-  control = os.path.join(home, 'control.json')
+  config = os.path.join(home, 'code', 'campfin_admin', 'datasync_config.json')
+  control = os.path.join(home, 'code', 'campfin', 'settings', 'datasync_control.json')
   csv = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
   dataset = 'rvjy-yeu3'
   logger.info(subprocess.Popen(

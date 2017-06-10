@@ -27,7 +27,11 @@ def transform_data(contribs_file_path):
     reader = DictReader(fh)
 
     for row in reader:
-      row_id = '%s-%s' % (row['ID'], row['origin'])
+      try:
+        row_id = '%s-%s' % (row['ID'], row['origin'])
+      except Exception, e:
+        logger.info('Error %s loading row: %s' % (e, row))
+        continue
       try:
         receipt_date = datetime.strptime(row['receipt_date'], settings.PDC_DATETIME_FORMAT)
       except Exception, e:

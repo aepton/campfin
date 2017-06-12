@@ -202,9 +202,9 @@ class Transaction(object):
     }
 
     self.set_donor_hash()
-    #self.process_alert_filters()
-    #if self.alert_emails:
-    #  self.update_alert_files()
+    self.process_alert_filters()
+    if self.alert_emails:
+      self.update_alert_files()
 
   def process_alert_filters(self):
     if not self.alert_filters:

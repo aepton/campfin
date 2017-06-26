@@ -19,9 +19,9 @@ def load_alert_filehandles(alerts, header):
     for email in alert['emails']:
       if email not in fhs:
         fname = '%s.csv' % base64.urlsafe_b64encode(email)
-        fhs[email] = DictWriter(
-          open(os.path.join(settings.DATA_DIRECTORY, 'alerts', fname), 'w+'),
-          header)
+        path = os.path.join(settings.DATA_DIRECTORY, 'alerts', fname)
+        fh = open(path, 'w+')
+        fhs[email] = DictWriter(fh, header)
         fhs[email].writeheader()
   return fhs
 

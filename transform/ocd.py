@@ -214,7 +214,7 @@ class Transaction(object):
       for key in af:
         for val in af[key]:
           if self.props[key] == val:
-            [self.alert_emails.add(em) for em in af['emails']]
+            [self.alert_emails.add(em) for em in af[key]['emails']]
 
   def update_alert_files(self):
     for email in self.alert_emails:

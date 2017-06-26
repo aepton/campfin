@@ -133,6 +133,7 @@ def transform_data(file_path, data_type, year):
               raise
 
           if not os.path.exists(path):
+            logger.info('Creating path: %s' % path)
             with open(path, 'w+') as fh:
               writer = DictWriter(fh, ocd.TRANSACTION_CSV_HEADER)
               writer.writeheader()

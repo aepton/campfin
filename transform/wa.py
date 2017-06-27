@@ -73,7 +73,7 @@ def transform_data(contribs_file_path):
           alert_filters=alert_filters
         )
       except Exception, e:
-        error = 'ocd loading error: %s' % e
+        error = 'ocd loading error: %s (%s)' % (e, alert_filters)
         if error not in missing_rows:
           missing_rows[error] = 0
         missing_rows[error] += 1

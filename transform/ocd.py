@@ -210,13 +210,15 @@ class Transaction(object):
     if not self.alert_filters:
       self.alert_filters = utils.load_alert_filters(TRANSACTION_CSV_HEADER)
 
-    for afs in self.alert_filters['alerts']:
-      for af in afs:
-        for key in af.keys():
-          if key == 'emails':
-            continue
-          if self.props[key] == af[key]:
-            [self.alert_emails.add(em) for em in af['emails']]
+    for alert in self.alert_filters['alerts']:
+      matching = True
+      for key in alert.keys():
+        if key == 'emails':
+          continue
+        if self.props[key] != alert[key]:
+          matching = False
+      if matching:
+        [self.alert_emails.add(em) for em in af['emails']]
 
   def update_alert_files(self):
     for email in self.alert_emails:

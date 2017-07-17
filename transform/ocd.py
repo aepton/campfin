@@ -218,7 +218,7 @@ class Transaction(object):
         if self.props[key] != alert[key]:
           matching = False
       if matching:
-        [self.alert_emails.add(em) for em in af['emails']]
+        [self.alert_emails.add(em) for em in alert['emails']]
 
   def update_alert_files(self):
     for email in self.alert_emails:

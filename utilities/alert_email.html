@@ -1,0 +1,15 @@
+{% load humanize %}
+
+<h1>New transactions</h1>
+
+<h2>Contributions</h2>
+
+{% for filer in diffs.new %}
+  <h3>{{ filer }}</h3>
+
+  {% for contrib in diffs.new.get(filer).contribs %}
+    <p><strong>${{ contrib.amount__currency|floatformat:2|intcomma }}</strong> from {{ contrib.sender__person__name }} to {{ contrib.recipient__organization__name }} on {{ contrib.date }}</p>
+  {% endfor %}
+  <hr>
+  }
+{% endfor %}

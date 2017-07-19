@@ -41,44 +41,44 @@ def transform_data(contribs_file_path):
         missing_rows[error] += 1
         continue
 
-      try:
-        ocd_row = Transaction(
-          row_id='ocd-campaignfinance-transaction/%s' % uuid.uuid5(uuid.NAMESPACE_OID, row_id).hex,
-          filing__action__id=None,
-          identifier=row_id,
-          classification='contribution',
-          amount__value=Decimal(row['amount'].replace('$', '')),
-          amount__currency='$',
-          amount__is_inkind=True if row['cash_or_in_kind'] == 'Cash' else False,
-          sender__entity_type='p',
-          sender__person__name=row['contributor_name'],
-          sender__person__employer=row['contributor_employer_name'],
-          sender__person__occupation=row['contributor_occupation'],
-          sender__person__location=', '.join(
-            [e for e in [
-              row['contributor_address'],
-              row['contributor_city'],
-              row['contributor_state'],
-              row['contributor_zip']
-            ] if e]),
-          recipient__entity_type='o',
-          recipient__organization__name=row['filer_name'],
-          recipient__organization__entity_id=row['filer_id'],
-          recipient__organization__state='WA',
-          sources__url=row['url'].replace('View report (', '')[:-1],
-          filing__recipient='PDC',
-          date=receipt_date.strftime(settings.OCD_DATETIME_FMT),
-          description=row['description'],
-          note=row['memo'],
-          alert_filters=alert_filters
-        )
-      except Exception, e:
+      #try:
+      ocd_row = Transaction(
+        row_id='ocd-campaignfinance-transaction/%s' % uuid.uuid5(uuid.NAMESPACE_OID, row_id).hex,
+        filing__action__id=None,
+        identifier=row_id,
+        classification='contribution',
+        amount__value=Decimal(row['amount'].replace('$', '')),
+        amount__currency='$',
+        amount__is_inkind=True if row['cash_or_in_kind'] == 'Cash' else False,
+        sender__entity_type='p',
+        sender__person__name=row['contributor_name'],
+        sender__person__employer=row['contributor_employer_name'],
+        sender__person__occupation=row['contributor_occupation'],
+        sender__person__location=', '.join(
+          [e for e in [
+            row['contributor_address'],
+            row['contributor_city'],
+            row['contributor_state'],
+            row['contributor_zip']
+          ] if e]),
+        recipient__entity_type='o',
+        recipient__organization__name=row['filer_name'],
+        recipient__organization__entity_id=row['filer_id'],
+        recipient__organization__state='WA',
+        sources__url=row['url'].replace('View report (', '')[:-1],
+        filing__recipient='PDC',
+        date=receipt_date.strftime(settings.OCD_DATETIME_FMT),
+        description=row['description'],
+        note=row['memo'],
+        alert_filters=alert_filters
+      )
+      """except Exception, e:
         error = 'ocd loading error: %s (%s)' % (e, alert_filters)
         if error not in missing_rows:
           missing_rows[error] = 0
         missing_rows[error] += 1
         continue
-
+      """
       path = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
 
       if path not in file_handles:

@@ -38,13 +38,14 @@ def generate_diff(path):
     again, and fill out dicts of new and removed txactns, grouped by campaign and then by type (
     contrib, expense, etc).
   """
+  alerts_dir = os.path.join(settings.DATA_DIRECTORY, 'alerts')
   alerts = {
     'new': set(),
     'old': set()
   }
 
   for (p, path_type) in [(path, 'new'), ('%s.old' % path, 'old')]:
-    with open(path) as fh:
+    with open(os.path.join(alerts_dir, path)) as fh:
       reader = DictReader(fh)
 
       for row in reader:
@@ -64,7 +65,7 @@ def generate_diff(path):
 
   # Gotta do 2 passes, unfortunately.
   for (p, path_type) in [(path, 'new'), ('%s.old' % path, 'removed')]:
-    with open(path) as fh:
+    with open(os.path.join(alerts_dir, path)) as fh:
       reader = DictReader(fh)
 
       for row in reader:

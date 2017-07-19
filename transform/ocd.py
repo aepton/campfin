@@ -223,7 +223,7 @@ class Transaction(object):
   def update_alert_files(self):
     for email in self.alert_emails:
       if email in self.alert_filters['filehandles']:
-        self.alert_filters['filehandles'].writerow(self.to_csv_row())
+        self.alert_filters['filehandles'][email].writerow(self.to_csv_row())
 
   def set_donor_hash(self):
     record = {

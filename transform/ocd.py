@@ -218,6 +218,7 @@ class Transaction(object):
         if self.props[key] != alert[key]:
           matching = False
       if matching:
+        logger.info('Storing alert on %s: %s for %s' % (key, self.props[key], alert['emails']))
         [self.alert_emails.add(em) for em in alert['emails']]
 
   def update_alert_files(self):

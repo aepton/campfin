@@ -210,8 +210,6 @@ class Transaction(object):
     if not self.alert_filters:
       self.alert_filters = utils.load_alert_filters(TRANSACTION_CSV_HEADER)
 
-    logger.info('Alert filters: %s' % self.alert_filters)
-
     for alert in self.alert_filters['alerts']:
       matching = True
       for key in alert.keys():

@@ -58,6 +58,9 @@ def upload_to_socrata():
     shell=True,
     stdout=subprocess.PIPE).stdout.read())
 
-def upload_to_s3():
-  local_path = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
-  utils.write_to_s3('WA.csv', local_path=local_path)
+def upload_to_s3(path='WA.csv'):
+  local_path = os.path.join(settings.OCD_DIRECTORY, path)
+  try:
+    utils.write_to_s3(path, local_path=local_path)
+  except Exception, e:
+    logger.info('Error uploading %s: %s' % (path, e))

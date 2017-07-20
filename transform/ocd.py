@@ -215,7 +215,7 @@ class Transaction(object):
       for key in alert.keys():
         if key == 'emails':
           continue
-        if self.props[key] != alert[key]:
+        if self.props.get(key, None) != alert[key]:
           matching = False
       if matching:
         logger.info(

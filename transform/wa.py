@@ -41,7 +41,7 @@ def transform_data(contribs_file_path):
         missing_rows[error] += 1
         continue
 
-      #try:
+      try:
       ocd_row = Transaction(
         row_id='ocd-campaignfinance-transaction/%s' % uuid.uuid5(uuid.NAMESPACE_OID, row_id).hex,
         filing__action__id=None,
@@ -72,13 +72,13 @@ def transform_data(contribs_file_path):
         note=row['memo'],
         alert_filters=alert_filters
       )
-      """except Exception, e:
+      except Exception, e:
         error = 'ocd loading error: %s (%s)' % (e, alert_filters)
         if error not in missing_rows:
           missing_rows[error] = 0
         missing_rows[error] += 1
         continue
-      """
+
       path = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
 
       if path not in file_handles:

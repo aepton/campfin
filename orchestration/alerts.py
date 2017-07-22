@@ -3,6 +3,7 @@ import hashlib
 import logging
 import os
 
+from csv import DictReader
 from datetime import datetime
 from jinja2 import Template
 from utilities import email

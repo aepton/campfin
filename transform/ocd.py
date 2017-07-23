@@ -218,6 +218,7 @@ class Transaction(object):
         if self.props.get(key, None) != alert[key]:
           matching = False
       if matching:
+        logger.info('Found match; alert: %s' % alert)
         logger.info(
           'Storing alert on %s: %s for %s' % (key, self.props[key], alert.get('emails', alert)))
         [self.alert_emails.add(em) for em in alert.get('emails', [])]

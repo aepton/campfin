@@ -82,6 +82,6 @@ def generate_diff(path):
 
 
 def format_diff(diff):
-  with open(os.path.join(ROOT_DIRECTORY, 'utilities', 'alert_email.html')) as fh:
+  with open(os.path.join(settings.ROOT_DIRECTORY, 'utilities', 'alert_email.html')) as fh:
     template = Template(fh.read())
     return template.render({'diff': diff})

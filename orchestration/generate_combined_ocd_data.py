@@ -14,6 +14,7 @@ from orchestration import alerts, utils
 logger = logging.getLogger(__name__)
 
 def orchestrate():
+  logger.info('Beginning a new run')
   logger.info('Starting cleanup')
   utils.cleanup_data_dirs()
 

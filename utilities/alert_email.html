@@ -2,10 +2,10 @@
 
 <h2>Contributions</h2>
 
-{% for filer in diffs.new %}
+{% for filer in diff.new %}
   <h3>{{ filer }}</h3>
 
-  {% for contrib in diffs.new.get(filer).contribs %}
+  {% for contrib in diff.new.get(filer).contribs %}
     <p><strong>${{ "${:,.2f}".format(contrib.amount__value) }}</strong> from {{ contrib.sender__person__name }} to {{ contrib.recipient__organization__name }} on {{ contrib.date }}</p>
   {% endfor %}
   <hr>

@@ -218,10 +218,15 @@ class Transaction(object):
         if self.props.get(key, None) != alert[key]:
           matching = False
       if matching:
-        logger.info('Found match; alert: %s (%s)' % (alert, self.alert_filters))
         logger.info(
-          'Storing alert on %s: %s for %s' % (key, self.props[key], alert.get('emails', alert)))
-        [self.alert_emails.add(em) for em in alert.get('emails', [])]
+          'Found match; alert: %s (%s); props: %s' % (alert, self.alert_filters, self.props))
+        try:
+          logger.info(
+            'Storing alert on %s: %s for %s' % (key, self.props[key], alert['emails']))
+          [self.alert_emails.add(em) for em in alert['emails']]
+        except Exception, e:
+          logger.info('Error storing alert %s for props %s: %s' % (alert, self.props, e))
+
 
   def update_alert_files(self):
     for email in self.alert_emails:

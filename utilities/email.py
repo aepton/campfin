@@ -1,6 +1,8 @@
 import boto3
 import logging
 
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from settings import settings
 
 logger = logging.getLogger(__name__)

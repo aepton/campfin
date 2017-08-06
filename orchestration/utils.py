@@ -27,6 +27,8 @@ def cleanup_data_dirs():
       shutil.rmtree(os.path.join(settings.DATA_DIRECTORY, state))
     except:
       continue
+  # Remove OCD data files as well
+  shutil.rmtree(os.path.join(settings.DATA_DIRECTORY, 'OCD'))
 
 def download_and_process_fec_data():
   fec_fetch.download_headers()

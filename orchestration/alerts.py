@@ -6,7 +6,7 @@ import os
 from csv import DictReader
 from datetime import datetime
 from jinja2 import Template
-from utilities import email
+from utilities import email_utils
 from settings import settings
 
 logger = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ def process_alerts():
       formatted_diff = format_diff(diff)
 
       to_addresses = [base64.urlsafe_b64decode(path[:-4])]
-      email.send_email(to_addresses=to_addresses, subject='Alerts as of', body=formatted_diff)
+      email_utils.send_email(to_addresses=to_addresses, subject='Alerts as of', body=formatted_diff)
 
       os.rename(path, '%s.old' % path)
 

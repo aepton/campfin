@@ -219,7 +219,8 @@ class Transaction(object):
           matching = False
       if matching:
         logger.info(
-          'Found match; alert: %s (%s); props: %s' % (alert, self.alert_filters, self.props))
+          'Found match; alert: %s (%s); props: %s, alert type: %s, keys: %s' % (
+            alert, self.alert_filters, self.props, type(alert), alert.keys()))
         try:
           logger.info(
             'Storing alert on %s: %s for %s' % (key, self.props[key], alert['emails']))

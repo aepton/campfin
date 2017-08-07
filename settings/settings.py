@@ -19,7 +19,7 @@ AWS_REGION = 'us-east-1'
 S3_BUCKET = 'campfin'
 STREAMING_CHUNK_SIZE = 4096
 
-EMAIL_FROM_ADDRESS = 'noreply@campfin.org'
+EMAIL_FROM_ADDRESS = 'abraham.epton@gmail.com'
 
 STATES_IMPLEMENTED = ['FEC', 'WA']
 YEARS_IMPLEMENTED = ['2004']

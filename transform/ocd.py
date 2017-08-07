@@ -226,7 +226,7 @@ class Transaction(object):
           [self.alert_emails.add(em) for em in alert['emails']]
         except Exception, e:
           logger.info('Error storing alert %s for props %s: %s, %s, %s' % (
-            alert, self.props, type(ex).__name__, ex.args, alert.keys()))
+            alert, self.props, type(e).__name__, e.args, alert.keys()))
 
 
   def update_alert_files(self):

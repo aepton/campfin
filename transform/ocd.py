@@ -218,9 +218,6 @@ class Transaction(object):
         if self.props.get(key, None) != alert[key]:
           matching = False
       if matching:
-        logger.info(
-          'Found match; alert: %s (%s); props: %s, alert type: %s, keys: %s' % (
-            alert, self.alert_filters, self.props, type(alert), alert.keys()))
         try:
           [self.alert_emails.add(em) for em in alert['emails']]
         except Exception, e:
@@ -231,7 +228,7 @@ class Transaction(object):
   def update_alert_files(self):
     for email in self.alert_emails:
       if email in self.alert_filters['filehandles']:
-        self.alert_filters['filehandles'][email].writerow(self.to_csv_row())
+        self.alert_filters['filehandles'][email].writerow(self)
 
   def set_donor_hash(self):
     record = {

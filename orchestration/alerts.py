@@ -46,7 +46,7 @@ def generate_diff(path):
   }
 
   for (p, path_type) in [(path, 'new'), ('%s.old' % path, 'old')]:
-    with open(os.path.join(alerts_dir, path)) as fh:
+    with open(os.path.join(alerts_dir, p)) as fh:
       reader = DictReader(fh)
 
       for row in reader:

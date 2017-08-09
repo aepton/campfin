@@ -59,6 +59,10 @@ def generate_diff(path):
     'removed': alerts['old'] - alerts['new']
   }
 
+  logger.info(
+    'Found %d new alerts, %d old alerts, %d new hashes and %d removed hashes' % (
+      len(alerts['new']), len(alerts['old']), len(hashes['new']), len(hashes['removed'])))
+
   diff = {
     'new': {},
     'removed': {}
@@ -77,6 +81,10 @@ def generate_diff(path):
           if filer_id not in diff[path_type]:
             diff[path_type][filer_id]['contribs'] = []
           diff[path_type][filer_id]['contribs'].append(row)
+
+  logger.info(
+    'Diff contains alerts for %d committees with new alerts and %d committees with removed' % (
+      len(diff['new']), len(diff['removed'])))
 
   return diff
 

@@ -217,18 +217,11 @@ class Transaction(object):
           continue
         if self.props.get(key, None) != alert[key]:
           matching = False
-        else:
-          logger.info('Matching alert: %s' % alert)
       if matching:
         logger.info(
           'Found match; alert: %s (%s); props: %s, alert type: %s, keys: %s' % (
             alert, self.alert_filters, self.props, type(alert), alert.keys()))
-        if 'emails' not in alert:
-          logger.info('No emails in alert')
-          continue
         try:
-          logger.info(
-            'Storing alert on %s: %s for %s' % (key, self.props[key], alert['emails']))
           [self.alert_emails.add(em) for em in alert['emails']]
         except Exception, e:
           logger.info('Error storing alert %s for props %s: %s, %s, %s' % (

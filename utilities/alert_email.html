@@ -6,7 +6,7 @@
   <h3>{{ filer }}</h3>
 
   {% for contrib in diff["new"][filer]["contribs"] %}
-    <p><strong>${{ "${:,.2f}".format(contrib.amount__value) }}</strong> from {{ contrib.sender__person__name }} to {{ contrib.recipient__organization__name }} on {{ contrib.date }}</p>
+    <p><strong>${{ "${:,.2f}".format(float(contrib.amount__value)) }}</strong> from {{ contrib.sender__person__name }} to {{ contrib.recipient__organization__name }} on {{ contrib.date }}</p>
   {% endfor %}
   <hr>
   }

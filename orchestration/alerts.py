@@ -79,7 +79,7 @@ def generate_diff(path):
         if hash_digest in hashes[path_type]:
           filer_id = row['recipient__organization__entity_id']
           if filer_id not in diff[path_type]:
-            diff[path_type][filer_id]['contribs'] = []
+            diff[path_type][filer_id] = {'contribs': []}
           diff[path_type][filer_id]['contribs'].append(row)
 
   logger.info(

@@ -5,9 +5,8 @@
 {% for filer in diff["new"] %}
   <h3>{{ filer }}</h3>
 
-  {% for contrib in diff["new"][filer]["contribs"] %}
+  {% for contrib in sorted(diff["new"][filer]["contribs"], key=lambda c: c.amount__value, reverse=True) %}
     <p><strong>${{ contrib.amount__value }}</strong> from {{ contrib.sender__person__name }} to {{ contrib.recipient__organization__name }} on {{ contrib.date }}</p>
   {% endfor %}
   <hr>
-  }
 {% endfor %}

@@ -92,4 +92,9 @@ def generate_diff(path):
 def format_diff(diff):
   with open(os.path.join(settings.ROOT_DIRECTORY, 'utilities', 'alert_email.html')) as fh:
     template = Template(fh.read())
-    return template.render({'diff': diff})
+    sorted_diffs = {'new': {}, 'removed': {}}
+    for key in ['new', 'removed']:
+      for filer in diff[key]:
+        sorted_diffs[key][filer] = sorted(
+          diff["new"][filer]["contribs"], key=lambda c: c.amount__value, reverse=True)
+    return template.render({'diff': sorted_diffs})

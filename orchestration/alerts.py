@@ -96,5 +96,5 @@ def format_diff(diff):
     for key in ['new', 'removed']:
       for filer in diff[key]:
         sorted_diffs[key][filer] = sorted(
-          diff["new"][filer]["contribs"], key=lambda c: c.amount__value, reverse=True)
+          diff["new"][filer]["contribs"], key=lambda c: c['amount__value'], reverse=True)
     return template.render({'diff': sorted_diffs})

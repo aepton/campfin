@@ -41,89 +41,107 @@ def load_committee_metadata(year):
 
   return committees
 
+def transform_contribution(row, committees):
+  in_kind_codes = ['15Z', '24Z']
+  try:
+    receipt_date = datetime.strptime(row['TRANSACTION_DT'], settings.FEC_DATETIME_FMT)
+  except Exception, e:
+    error = 'receipt date error: %s' % e
+    return ({}, error, [])
+
+  try:
+    ocd_row = ocd.Transaction(
+      row_id='ocd-campaignfinance-transaction/%s' % uuid.uuid5(
+        uuid.NAMESPACE_OID, row['SUB_ID']).hex,
+      filing__action__id=None,
+      identifier=row['SUB_ID'],
+      classification='contribution',
+      amount__value=Decimal(row['TRANSACTION_AMT']),
+      amount__currency='$',
+      amount__is_inkind=True if row['TRANSACTION_TP'] in in_kind_codes else False,
+      sender__entity_type='p',
+      sender__person__name=row['NAME'],
+      sender__person__employer=row['EMPLOYER'],
+      sender__person__occupation=row['OCCUPATION'],
+      sender__person__location=', '.join(
+        [e for e in [
+          row['CITY'],
+          row['STATE'],
+          row['ZIP_CODE']
+        ] if e]),
+      recipient__entity_type='o',
+      recipient__organization__entity_id=row['CMTE_ID'],
+      recipient__organization__name=committees[row['CMTE_ID']]['name'],
+      recipient__organization__state=committees[row['CMTE_ID']]['state'],
+      sources__url='http://docquery.fec.gov/cgi-bin/fecimg/?%s' % row['IMAGE_NUM'],
+      filing__recipient='FEC',
+      date=receipt_date.strftime(settings.OCD_DATETIME_FMT),
+      description=row['MEMO_CD'],
+      note=row['MEMO_TEXT'],
+      alert_filters=alert_filters
+    )
+  except Exception, e:
+    error = 'ocd loading error: %s' % e
+    return ({}, error, [])
+
+  # Handle contributions to a particular state, and from within that state
+  relevant_states = set([committees[row['CMTE_ID']]['state'], row['STATE']])
+  return (ocd_row, None, relevant_states)
+
 def transform_data(file_path, data_type, year):
   # General FEC settings
   delimiter = ','
-  in_kind_codes = ['15Z', '24Z']
   fec_directory = os.path.join(settings.DATA_DIRECTORY, 'FEC')
   year_directory = os.path.join(fec_directory, year)
 
   # Specific settings depending on what type of file we're transforming
-  if data_type == 'contributions':
-    header_path = os.path.join(fec_directory, 'contributions_header', 'contributions_header.csv')
-    with open(header_path) as fh:
-      header = fh.read().strip().split(',')
+  input_settings = {
+    'contributions': {
+      'delimiter': '|',
+      'path': os.path.join(fec_directory, 'contributions_header', 'contributions_header.csv')
+    }
+  }
 
-    delimiter = '|'
+  with open(input_settings[data_type]['path']) as fh:
+    header = fh.read().strip().split(',')
 
   # Load committee metadata (some of which we'll attach to individual rows)
   committees = load_committee_metadata(year)
 
+  # Load transformation functions
+  transform_row = {
+    'contributions': transform_contribution
+  }
+
+  # Load alert filters for contribution type
+  output_header = {
+    'contributions': ocd.TRANSACTION_CSV_HEADER
+  }
+  alert_filters = utils.load_alert_filters(output_header[data_type], data_type)
+
   # Now load and transform the data we were asked to transform
-  alert_filters = utils.load_alert_filters(ocd.TRANSACTION_CSV_HEADER)
   counter = 0
   missing_rows = {}
   file_handles = {}
 
   with open(file_path) as fh:
-    reader = DictReader(fh, header, delimiter=delimiter)
+    reader = DictReader(fh, header, delimiter=input_settings[data_type]['delimiter'])
 
     for row in reader:
-      try:
-        receipt_date = datetime.strptime(row['TRANSACTION_DT'], settings.FEC_DATETIME_FMT)
-      except Exception, e:
-        error = 'receipt date error: %s' % e
+      (ocd_row, error, relevant_states) = transform_row[data_type](row, committees)
+      if error:
         if error not in missing_rows:
           missing_rows[error] = 0
         missing_rows[error] += 1
         continue
 
-      try:
-        ocd_row = ocd.Transaction(
-          row_id='ocd-campaignfinance-transaction/%s' % uuid.uuid5(
-            uuid.NAMESPACE_OID, row['SUB_ID']).hex,
-          filing__action__id=None,
-          identifier=row['SUB_ID'],
-          classification='contribution',
-          amount__value=Decimal(row['TRANSACTION_AMT']),
-          amount__currency='$',
-          amount__is_inkind=True if row['TRANSACTION_TP'] in in_kind_codes else False,
-          sender__entity_type='p',
-          sender__person__name=row['NAME'],
-          sender__person__employer=row['EMPLOYER'],
-          sender__person__occupation=row['OCCUPATION'],
-          sender__person__location=', '.join(
-            [e for e in [
-              row['CITY'],
-              row['STATE'],
-              row['ZIP_CODE']
-            ] if e]),
-          recipient__entity_type='o',
-          recipient__organization__entity_id=row['CMTE_ID'],
-          recipient__organization__name=committees[row['CMTE_ID']]['name'],
-          recipient__organization__state=committees[row['CMTE_ID']]['state'],
-          sources__url='http://docquery.fec.gov/cgi-bin/fecimg/?%s' % row['IMAGE_NUM'],
-          filing__recipient='FEC',
-          date=receipt_date.strftime(settings.OCD_DATETIME_FMT),
-          description=row['MEMO_CD'],
-          note=row['MEMO_TEXT'],
-          alert_filters=alert_filters
-        )
-      except Exception, e:
-        error = 'ocd loading error: %s' % e
-        if error not in missing_rows:
-          missing_rows[error] = 0
-        missing_rows[error] += 1
-        continue
-
-      # Handle contributions to a particular state, and from within that state
-      for state in set([committees[row['CMTE_ID']]['state'], row['STATE']]):
+      for state in relevant_states:
         if state.find('/') != -1:
           logger.warning('Odd, found slash in state for %s' % row)
           state = state.replace('/', '')
         if state not in settings.STATES_IMPLEMENTED:
           continue
-        path = os.path.join(settings.OCD_DIRECTORY, '%s.csv' % state)
+        path = os.path.join(settings.OCD_DIRECTORY, data_type, '%s.csv' % state)
 
         if path not in file_handles:
           try:
@@ -132,10 +150,16 @@ def transform_data(file_path, data_type, year):
             if exception.errno != errno.EEXIST:
               raise
 
+          try:
+            os.makedirs(os.path.join(settings.OCD_DIRECTORY, data_type))
+          except OSError as exception:
+            if exception.errno != errno.EEXIST:
+              raise
+
           if not os.path.exists(path):
             logger.info('Creating path: %s' % path)
             with open(path, 'w+') as fh:
-              writer = DictWriter(fh, ocd.TRANSACTION_CSV_HEADER)
+              writer = DictWriter(fh, output_header[data_type])
               writer.writeheader()
               fh.close()
 

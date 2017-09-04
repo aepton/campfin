@@ -13,27 +13,27 @@ from settings import settings
 
 logger = logging.getLogger(__name__)
 
-def load_alert_filehandles(alerts, header):
+def load_alert_filehandles(alerts, header, data_type):
   fhs = {}
   for alert in alerts:
     for email in alert['emails']:
       if email not in fhs:
-        fname = '%s.csv' % base64.urlsafe_b64encode(email)
+        fname = '%s.csv' % base64.urlsafe_b64encode('%s_%s' % (email, data_type))
         path = os.path.join(settings.DATA_DIRECTORY, 'alerts', fname)
         fh = open(path, 'w+')
         fhs[email] = DictWriter(fh, header)
         fhs[email].writeheader()
   return fhs
 
-def load_alert_filters(header):
-  with open(os.path.join(settings.DATA_DIRECTORY, 'alerts.json')) as fh:
+def load_alert_filters(header, data_type):
+  with open(os.path.join(settings.DATA_DIRECTORY, 'alerts_%s.json' % data_type)) as fh:
     filters = {}
     try:
       filters['alerts'] = json.loads(fh.read())
     except Exception, e:
       logger.info('No alert filters loaded: %s' % e)
       filters['alerts'] = []
-    filters['filehandles'] = load_alert_filehandles(filters['alerts'], header)
+    filters['filehandles'] = load_alert_filehandles(filters['alerts'], header, data_type)
     return filters
 
 def write_to_s3(s3_path, local_path=None, contents=None, bucket=settings.S3_BUCKET):

@@ -37,8 +37,10 @@ def download_and_process_fec_data():
     logger.info('Fetching FEC year %s' % year)
     for url_type, url in settings.DATA_URLS[year]:
       file_path = os.path.join(fec_fetch.download_data(url, url_type, year), 'itcont.txt')
-      if url_type == 'contributions':
-        fec_fetch.cleanup_unnecessary_contribution_files(year)
+
+      if url_type in settings.SUPPORTED_FEC_TYPES:
+        if url_type == 'contributions':
+          fec_fetch.cleanup_unnecessary_contribution_files(year)
         fec_transform.transform_data(file_path, url_type, year)
     fec_fetch.cleanup_data(year)
 

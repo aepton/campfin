@@ -36,3 +36,6 @@ for year in YEARS_IMPLEMENTED:
     ('expenditures', 'ftp://ftp.fec.gov/FEC/%s/oppexp%s.zip' % (year, cycle)),
     ('contributions', 'ftp://ftp.fec.gov/FEC/%s/indiv%s.zip' % (year, cycle))
   ]
+
+SUPPORTED_FEC_TYPES = ['contributions']
+SUPPORTED_PDC_TYPES = []

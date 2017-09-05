@@ -1,7 +1,6 @@
 import errno
 import locale
 import logging
-import ocd
 import os
 import uuid
 
@@ -9,6 +8,7 @@ from csv import DictReader, DictWriter
 from datetime import datetime
 from decimal import *
 from deduplication import deduper
+from ocd import transaction
 from settings import settings
 from utilities import utils
 
@@ -50,7 +50,7 @@ def transform_contribution(row, committees):
     return ({}, error, [])
 
   try:
-    ocd_row = ocd.Transaction(
+    ocd_row = transaction.Transaction(
       row_id='ocd-campaignfinance-transaction/%s' % uuid.uuid5(
         uuid.NAMESPACE_OID, row['SUB_ID']).hex,
       filing__action__id=None,
@@ -115,7 +115,7 @@ def transform_data(file_path, data_type, year):
 
   # Load alert filters for contribution type
   output_header = {
-    'contributions': ocd.TRANSACTION_CSV_HEADER
+    'contributions': transaction.TRANSACTION_CSV_HEADER
   }
   alert_filters = utils.load_alert_filters(output_header[data_type], data_type)
 

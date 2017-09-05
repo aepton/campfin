@@ -8,7 +8,7 @@ from csv import DictReader, DictWriter
 from datetime import datetime
 from decimal import *
 from deduplication import deduper
-from ocd import *
+from ocd import transaction
 from settings import settings
 from utilities import utils
 
@@ -42,7 +42,7 @@ def transform_data(contribs_file_path):
         continue
 
       try:
-        ocd_row = Transaction(
+        ocd_row = transaction.Transaction(
           row_id='ocd-campaignfinance-transaction/%s' % uuid.uuid5(uuid.NAMESPACE_OID, row_id).hex,
           filing__action__id=None,
           identifier=row_id,
@@ -91,7 +91,7 @@ def transform_data(contribs_file_path):
         if not os.path.exists(path):
           logger.info('Creating path: %s' % path)
           with open(path, 'w+') as fh:
-            writer = DictWriter(fh, TRANSACTION_CSV_HEADER)
+            writer = DictWriter(fh, transaction.TRANSACTION_CSV_HEADER)
             writer.writeheader()
             fh.close()
 

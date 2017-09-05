@@ -2,6 +2,7 @@ import base64
 import boto3
 import json
 import logging
+import ocd_base
 import os
 import uuid
 
@@ -138,10 +139,11 @@ TRANSACTION_COLUMNS = [
 ]
 
 TRANSACTION_CSV_HEADER = [h['csv_name'] for h in TRANSACTION_COLUMNS]
+
 TRANSACTION_BLUEPRINT_COLS = [
   {'name': h['name'], 'datatype': h['datatype']} for h in TRANSACTION_COLUMNS]
 
-class Transaction(object):
+class Transaction(ocd_base.OCD):
   def __init__(
       self,
       row_id='',
@@ -169,12 +171,14 @@ class Transaction(object):
       alert_file_handles={},
       alert_filters=[]):
 
+    super(ocd_base.OCD, self).__init__()
+
     self.alert_emails = set()
     self.alert_file_handles = alert_file_handles
     self.alert_filters = alert_filters
     self.csv_header = csv_header
 
-    self.props = {
+    self.props.update({
       'id': row_id,
       'filing__recipient': filing__recipient,
       'filing__action__id': filing__action__id,
@@ -199,7 +203,7 @@ class Transaction(object):
       'donor_hash': '',
       'cluster_id': '',
       'related_cluster_id': ''
-    }
+    })
 
     self.set_donor_hash()
     self.process_alert_filters()
@@ -252,9 +256,3 @@ class Transaction(object):
       self.props['cluster_id'] = response['Item']['clusterID']
     except Exception, e:
       pass
-
-  def to_csv_row(self):
-    row_output = StringIO()
-    writer = DictWriter(row_output, self.csv_header)
-    writer.writerow(self.props)
-    return row_output.getvalue()

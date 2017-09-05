@@ -28,7 +28,10 @@ def cleanup_data_dirs():
     except:
       continue
   # Remove OCD data files as well
-  shutil.rmtree(os.path.join(settings.DATA_DIRECTORY, 'OCD'))
+  try:
+    shutil.rmtree(os.path.join(settings.DATA_DIRECTORY, 'OCD'))
+  except:
+    pass
 
 def download_and_process_fec_data():
   fec_fetch.download_headers()
@@ -42,7 +45,8 @@ def download_and_process_fec_data():
         if url_type == 'contributions':
           fec_fetch.cleanup_unnecessary_contribution_files(year)
         fec_transform.transform_data(file_path, url_type, year)
-    fec_fetch.cleanup_data(year)
+
+  fec_fetch.cleanup_data(year)
 
 def download_and_process_wa_data():
   data_file_path = wa_fetch.download_data()

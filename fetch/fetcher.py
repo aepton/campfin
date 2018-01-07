@@ -62,7 +62,7 @@ class Fetcher(object):
         logger.warning('Error downloading %s: %s' % (self.download_url, e))
         if self.retry_attempts:
           logger.info('Retrying %d more times' % self.retry_attempts)
-          self.download_data()
+          self.download_data_by_line(prepare_automatically=prepare_automatically)
 
       logger.info(
         'Finished with %d bad lines and %d successful ones' % (

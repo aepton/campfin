@@ -163,3 +163,53 @@ class Organization(OCD):
       'address__location': address__location,
       'external_link': external_link
     })
+
+CANDIDACY_COLUMNS = [
+  {
+    'name': 'ID',
+    'datatype': 'text',
+    'csv_name': 'id'
+  },
+  {
+    'name': 'Ballot Name',
+    'datatype': 'text',
+    'csv_name': 'ballot_name'
+  },
+  {
+    'name': 'Ballot Year',
+    'datatype': 'number',
+    'csv_name': 'ballot_year'
+  },
+  {
+    'name': 'Ballot Jurisdiction',
+    'datatype': 'text',
+    'csv_name': 'ballot_jurisdiction'
+  }
+]
+
+CANDIDACY_CSV_HEADER = [h['csv_name'] for h in CANDIDACY_COLUMNS]
+
+CANDIDACY_BLUEPRINT_COLS = [
+  {'name': h['name'], 'datatype': h['datatype']} for h in CANDIDACY_COLUMNS]
+
+class Candidacy(OCD):
+  def __init__(
+      self,
+      row_id='',
+      ballot_name='',
+      ballot_year=None,
+      ballot_jurisdiction='',
+      csv_header=CANDIDACY_CSV_HEADER):
+    super(OCD, self).__init__()
+
+    self.csv_header = csv_header
+
+    if row_id == '':
+      row_id = '-'.join([ballot_name, ballot_year, ballot_jurisdiction])
+
+    self.props.update({
+      'id': row_id,
+      'ballot_name': ballot_name,
+      'ballot_year': ballot_year,
+      'ballot_jurisdiction': ballot_jurisdiction
+    })

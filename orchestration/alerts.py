@@ -46,7 +46,11 @@ def generate_diff(path):
   }
 
   for (p, path_type) in [(path, 'new'), ('%s.old' % path, 'old')]:
-    with open(os.path.join(alerts_dir, p)) as fh:
+    full_path = os.path.join(alerts_dir, p)
+    if not os.path.exists(full_path):
+      open(full_path, 'wa').close()
+
+    with open(full_path) as fh:
       reader = DictReader(fh)
 
       for row in reader:

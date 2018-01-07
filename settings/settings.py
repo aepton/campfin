@@ -1,5 +1,7 @@
 import os
 
+from datetime import date
+
 ROOT_DIRECTORY = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 DATA_DIRECTORY = os.path.join(ROOT_DIRECTORY, 'data')
 OCD_DIRECTORY = os.path.join(DATA_DIRECTORY, 'OCD')
@@ -22,7 +24,9 @@ STREAMING_CHUNK_SIZE = 4096
 EMAIL_FROM_ADDRESS = 'abraham.epton@gmail.com'
 
 STATES_IMPLEMENTED = ['FEC', 'WA']
-YEARS_IMPLEMENTED = ['2004']
+YEAR_IMPLEMENTED_BEGIN = 2004
+YEAR_IMPLEMENTED_END = date.today().year
+YEARS_IMPLEMENTED = [str(year) for year in range(YEAR_IMPLEMENTED_BEGIN, YEAR_IMPLEMENTED_END)]
 
 DATA_URLS = {}
 for year in YEARS_IMPLEMENTED:

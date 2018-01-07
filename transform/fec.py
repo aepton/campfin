@@ -41,7 +41,7 @@ def load_committee_metadata(year):
 
   return committees
 
-def transform_contribution(row, committees):
+def transform_contribution(row, committees, alert_filters):
   in_kind_codes = ['15Z', '24Z']
   try:
     receipt_date = datetime.strptime(row['TRANSACTION_DT'], settings.FEC_DATETIME_FMT)
@@ -107,6 +107,7 @@ def transform_data(file_path, data_type, year):
 
   # Load committee metadata (some of which we'll attach to individual rows)
   committees = load_committee_metadata(year)
+  logger.info('Loaded %d committees' % len(committees))
 
   # Load transformation functions
   transform_row = {
@@ -118,6 +119,7 @@ def transform_data(file_path, data_type, year):
     'contributions': transaction.TRANSACTION_CSV_HEADER
   }
   alert_filters = utils.load_alert_filters(output_header[data_type], data_type)
+  logger.info('Loaded %d alert filters' % len(alert_filters))
 
   # Now load and transform the data we were asked to transform
   counter = 0
@@ -125,10 +127,11 @@ def transform_data(file_path, data_type, year):
   file_handles = {}
 
   with open(file_path) as fh:
+    logger.info('Opened %s' % file_path)
     reader = DictReader(fh, header, delimiter=input_settings[data_type]['delimiter'])
 
     for row in reader:
-      (ocd_row, error, relevant_states) = transform_row[data_type](row, committees)
+      (ocd_row, error, relevant_states) = transform_row[data_type](row, committees, alert_filters)
       if error:
         if error not in missing_rows:
           missing_rows[error] = 0

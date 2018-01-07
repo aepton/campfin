@@ -171,7 +171,7 @@ class Transaction(ocd_base.OCD):
       alert_file_handles={},
       alert_filters=[]):
 
-    super(ocd_base.OCD, self).__init__()
+    super(Transaction, self).__init__()
 
     self.alert_emails = set()
     self.alert_file_handles = alert_file_handles
@@ -212,7 +212,8 @@ class Transaction(ocd_base.OCD):
 
   def process_alert_filters(self):
     if not self.alert_filters:
-      self.alert_filters = utils.load_alert_filters(TRANSACTION_CSV_HEADER)
+      self.alert_filters = utils.load_alert_filters(
+        TRANSACTION_CSV_HEADER, self.props['classification'])
 
     for alert in self.alert_filters['alerts']:
       matching = True

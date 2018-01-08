@@ -5,6 +5,7 @@ from settings import settings
 
 # Setting this up before other imports so everything logs correctly
 logging.basicConfig(
+  datefmt='%d/%m/%Y:%H:%M:%S',
   filename=os.path.join(settings.LOG_DIR, 'rebuild.log'),
   filemode='a',
   level=logging.INFO)

@@ -20,7 +20,7 @@ class Fetcher(object):
       file_type='',
       relative_name='',
       generate_year_containers=False,
-      retry_attempts=2):
+      retry_attempts=10):
 
     self.download_url = download_url
     self.state = state

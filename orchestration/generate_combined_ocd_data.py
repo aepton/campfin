@@ -22,7 +22,7 @@ def orchestrate():
   utils.cleanup_data_dirs()
 
   logger.info('Starting FEC')
-  utils.download_and_process_fec_data()
+  #utils.download_and_process_fec_data()
 
   logger.info('Starting WA')
   utils.download_and_process_wa_data()

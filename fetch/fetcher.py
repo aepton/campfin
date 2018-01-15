@@ -35,7 +35,7 @@ class Fetcher(object):
 
     self.setup_file()
 
-  def download_data_by_line(self, prepare_automatically=True):
+  def download_data_by_line(self):
     if not self.retry_attempts or not self.download_url or not self.file_path:
       return
 
@@ -65,7 +65,7 @@ class Fetcher(object):
         if self.retry_attempts:
           logger.info('Retrying %d more times' % self.retry_attempts)
           time.sleep(self.retry_attempts * self.retry_wait_interval)
-          self.download_data()
+          self.download_data_by_line()
 
       logger.info(
         'Finished with %d bad lines and %d successful ones' % (

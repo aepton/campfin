@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 jurisdiction = 'WA'
 
 def transform_data(contribs_file_path):
-  alert_filters = utils.load_alert_filters(TRANSACTION_CSV_HEADER)
+  alert_filters = utils.load_alert_filters(transaction.TRANSACTION_CSV_HEADER)
   counter = 0
   file_handles = {}
   missing_rows = {}

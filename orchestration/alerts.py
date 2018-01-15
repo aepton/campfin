@@ -46,13 +46,16 @@ def generate_diff(path):
   }
 
   for (p, path_type) in [(path, 'new'), ('%s.old' % path, 'old')]:
-    with open(os.path.join(alerts_dir, p)) as fh:
-      reader = DictReader(fh)
+    try:
+      with open(os.path.join(alerts_dir, p)) as fh:
+        reader = DictReader(fh)
 
-      for row in reader:
-        hash_digest = hashlib.md5(str(row)).hexdigest()
+        for row in reader:
+          hash_digest = hashlib.md5(str(row)).hexdigest()
 
-        alerts[path_type].add(hash_digest)
+          alerts[path_type].add(hash_digest)
+    except:
+      logger.info('Error loading path %s' % os.path.join(alerts_dir, p))
 
   hashes = {
     'new': alerts['new'] - alerts['old'],

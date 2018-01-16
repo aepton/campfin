@@ -28,7 +28,8 @@ def process_alerts():
       to_addresses = [base64.urlsafe_b64decode(path[:-4]).rsplit('_', 1)]
       email_utils.send_email(to_addresses=to_addresses, subject='Alerts as of', body=formatted_diff)
 
-      os.rename(path, '%s.old' % path)
+      full_path = os.path.join(alerts_dir, path)
+      os.rename(full_path, '%s.old' % full_path)
 
 
 def generate_diff(path):

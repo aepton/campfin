@@ -37,5 +37,5 @@ def send_email(
                 Source=message['From'],
                 Destinations=[message['To']])
         except Exception, e:
-            logger.info('Error %s sending email: %s' % e, message)
+            logger.info('Error %s sending email: %s' % (e, message))
             logger.info('To: %s' % address)

@@ -32,13 +32,22 @@ DATA_URLS = {}
 for year in YEARS_IMPLEMENTED:
   cycle = year[2:]
   DATA_URLS[year] = [
-    ('candidate_committee_link', 'ftp://ftp.fec.gov/FEC/%s/ccl%s.zip' % (year, cycle)),
-    ('candidate_master', 'ftp://ftp.fec.gov/FEC/%s/cn%s.zip' % (year, cycle)),
-    ('committee_master', 'ftp://ftp.fec.gov/FEC/%s/cm%s.zip' % (year, cycle)),
-    ('committee_to_committee', 'ftp://ftp.fec.gov/FEC/%s/oth%s.zip' % (year, cycle)),
-    ('committee_to_candidate', 'ftp://ftp.fec.gov/FEC/%s/pas2%s.zip' % (year, cycle)),
-    ('expenditures', 'ftp://ftp.fec.gov/FEC/%s/oppexp%s.zip' % (year, cycle)),
-    ('contributions', 'ftp://ftp.fec.gov/FEC/%s/indiv%s.zip' % (year, cycle))
+    (
+      'candidate_committee_link',
+      'https://www.fec.gov/files/bulk-downloads/%s/ccl%s.zip' % (year, cycle)
+    ),
+    ('candidate_master', 'https://www.fec.gov/files/bulk-downloads/%s/cn%s.zip' % (year, cycle)),
+    ('committee_master', 'https://www.fec.gov/files/bulk-downloads/%s/cm%s.zip' % (year, cycle)),
+    (
+      'committee_to_committee',
+      'https://www.fec.gov/files/bulk-downloads/%s/oth%s.zip' % (year, cycle)
+    ),
+    (
+      'committee_to_candidate',
+      'https://www.fec.gov/files/bulk-downloads/%s/pas2%s.zip' % (year, cycle)
+    ),
+    ('expenditures', 'https://www.fec.gov/files/bulk-downloads/%s/oppexp%s.zip' % (year, cycle)),
+    ('contributions', 'https://www.fec.gov/files/bulk-downloads/%s/indiv%s.zip' % (year, cycle))
   ]
 
 SUPPORTED_FEC_TYPES = ['contributions']

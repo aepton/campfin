@@ -5,8 +5,10 @@ from settings import settings
 
 # Setting this up before other imports so everything logs correctly
 logging.basicConfig(
+  datefmt='%d/%m/%Y:%H:%M:%S',
   filename=os.path.join(settings.LOG_DIR, 'rebuild.log'),
   filemode='a',
+  format='%(asctime)s %(filename)s %(levelname)s %(funcName)s:%(lineno)d ::: %(message)s',
   level=logging.INFO)
 
 from orchestration import alerts, utils

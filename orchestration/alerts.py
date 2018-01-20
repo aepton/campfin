@@ -25,10 +25,11 @@ def process_alerts():
 
       formatted_diff = format_diff(diff)
 
-      to_addresses = [base64.urlsafe_b64decode(path[:-4])]
+      to_addresses = [base64.urlsafe_b64decode(path[:-4]).rsplit('_', 1)[0]]
       email_utils.send_email(to_addresses=to_addresses, subject='Alerts as of', body=formatted_diff)
 
-      os.rename(path, '%s.old' % path)
+      full_path = os.path.join(alerts_dir, path)
+      os.rename(full_path, '%s.old' % full_path)
 
 
 def generate_diff(path):
@@ -46,17 +47,16 @@ def generate_diff(path):
   }
 
   for (p, path_type) in [(path, 'new'), ('%s.old' % path, 'old')]:
-    full_path = os.path.join(alerts_dir, p)
-    if not os.path.exists(full_path):
-      open(full_path, 'wa').close()
+    try:
+      with open(os.path.join(alerts_dir, p)) as fh:
+        reader = DictReader(fh)
 
-    with open(full_path) as fh:
-      reader = DictReader(fh)
+        for row in reader:
+          hash_digest = hashlib.md5(str(row)).hexdigest()
 
-      for row in reader:
-        hash_digest = hashlib.md5(str(row)).hexdigest()
-
-        alerts[path_type].add(hash_digest)
+          alerts[path_type].add(hash_digest)
+    except:
+      logger.info('Error loading path %s' % os.path.join(alerts_dir, p))
 
   hashes = {
     'new': alerts['new'] - alerts['old'],

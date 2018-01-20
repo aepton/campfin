@@ -29,9 +29,13 @@ def send_email(
         message.attach(part_html)
 
         logger.info('Emailing %s' % address)
-        connection.send_raw_email(
-            RawMessage={
-                'Data': message.as_string()
-            },
-            Source=message['From'],
-            Destinations=[message['To']])
+        try:
+            connection.send_raw_email(
+                RawMessage={
+                    'Data': message.as_string()
+                },
+                Source=message['From'],
+                Destinations=[message['To']])
+        except Exception, e:
+            logger.info('Error %s sending email: %s' % (e, message))
+            logger.info('To: %s' % address)

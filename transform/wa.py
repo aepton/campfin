@@ -79,7 +79,6 @@ def transform_data(file_path, data_type):
     'contributions': transaction.TRANSACTION_CSV_HEADER
   }
   alert_filters = utils.load_alert_filters(output_header[data_type], data_type)
-
   counter = 0
   file_handles = {}
   missing_rows = {}

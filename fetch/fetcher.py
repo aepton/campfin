@@ -20,7 +20,8 @@ class Fetcher(object):
       file_type='',
       relative_name='',
       generate_year_containers=False,
-      retry_attempts=2):
+      retry_attempts=100,
+      retry_wait_interval=1):
 
     self.download_url = download_url
     self.state = state
@@ -30,10 +31,11 @@ class Fetcher(object):
     self.relative_name = relative_name
     self.generate_year_containers = generate_year_containers
     self.retry_attempts = retry_attempts
+    self.retry_wait_interval = retry_wait_interval
 
     self.setup_file()
 
-  def download_data_by_line(self, prepare_automatically=True):
+  def download_data_by_line(self):
     if not self.retry_attempts or not self.download_url or not self.file_path:
       return
 
@@ -62,7 +64,8 @@ class Fetcher(object):
         logger.warning('Error downloading %s: %s' % (self.download_url, e))
         if self.retry_attempts:
           logger.info('Retrying %d more times' % self.retry_attempts)
-          self.download_data_by_line(prepare_automatically=prepare_automatically)
+          time.sleep(self.retry_attempts * self.retry_wait_interval)
+          self.download_data_by_line()
 
       logger.info(
         'Finished with %d bad lines and %d successful ones' % (
@@ -88,6 +91,7 @@ class Fetcher(object):
         logger.warning('Error downloading %s: %s' % (self.download_url, e))
         if self.retry_attempts:
           logger.info('Retrying %d more times' % self.retry_attempts)
+          time.sleep(self.retry_attempts * self.retry_wait_interval)
           self.download_data_pycurl()
 
   def download_data_ftp(self):
@@ -108,6 +112,7 @@ class Fetcher(object):
         logger.warning('Error downloading %s: %s' % (self.download_url, e))
         if self.retry_attempts:
           logger.info('Retrying %d more times' % self.retry_attempts)
+          time.sleep(self.retry_attempts * self.retry_wait_interval)
           self.download_data_ftp()
 
   def setup_file(self):

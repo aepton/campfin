@@ -9,6 +9,7 @@ from datetime import datetime
 from decimal import *
 from deduplication import deduper
 from ocd import transaction
+from settings import fec_identifiers
 from settings import settings
 from utilities import utils
 
@@ -34,9 +35,28 @@ def load_committee_metadata(year):
   with open(committee_master_data_path) as fh:
     reader = DictReader(fh, header, delimiter='|')
     for row in reader:
+      committee_types = []
+      committee_types.append(fec_identifiers.COMMITTEE_DESIGNATIONS[row['CMTE_DSGN'].upper()])
+      committee_types.append(fec_identifiers.COMMITTEE_TYPES[row['CMTE_TP'].upper()])
+      committee_types.append(row['CMTE_PTY_AFFILIATION'].upper())
+      committee_types.append(fec_identifiers.COMMITTEE_PARTIES[row['CMTE_PTY_AFFILIATION'].upper()])
+
       committees[row['CMTE_ID']] = {
         'name': row['CMTE_NM'],
-        'state': row['CMTE_ST']
+        'state': row['CMTE_ST'],
+        'officers': [{
+          'person': row['TRES_NM'],
+          'title': fec_identifiers.TREASURER
+        }],
+        'statuses': [{
+          'start_date': '01/01/%d' % (int(year) - 1),
+          'end_date': '12/31/%s' % year,
+          'note': 'Filed for this cycle',
+          'classification': fec_identifiers.BASIC_FILING_STATUS
+        }],
+        'committee_types': committee_types,
+        'candidacy_designations': ['%s%s' % (fec_identifiers.FEC_PREFIX, row['CAND_ID'])]
+        'notes': 'Connected organization: %s' % row['CONNECTED_ORG_NM']
       }
 
   return committees
@@ -88,7 +108,7 @@ def transform_contribution(row, committees, alert_filters):
   relevant_states = set([committees[row['CMTE_ID']]['state'], row['STATE']])
   return (ocd_row, None, relevant_states)
 
-def transform_data(file_path, data_type, year):
+def transform_transaction_data(file_path, data_type, year):
   # General FEC settings
   delimiter = ','
   fec_directory = os.path.join(settings.DATA_DIRECTORY, 'FEC')

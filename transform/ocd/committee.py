@@ -50,7 +50,7 @@ class CommitteeType(ocd_base.OCD):
       ballot_name='',
       ballot_year=None,
       ballot_jurisdiction='',
-      csv_header=CANDIDACY_CSV_HEADER):
+      csv_header=COMMITTEE_TYPE_CSV_HEADER):
     super(OCD, self).__init__()
 
     self.csv_header = csv_header

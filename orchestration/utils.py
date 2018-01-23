@@ -44,7 +44,7 @@ def download_and_process_fec_data():
       if url_type in settings.SUPPORTED_FEC_TYPES:
         fec_transform.transform_transaction_data(file_path, url_type, year)
 
-    fec_transform.
+    fec_transform.write_committee_data(year)
 
   fec_fetch.cleanup_data(year)
 

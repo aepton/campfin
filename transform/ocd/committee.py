@@ -77,19 +77,14 @@ COMMITTEE_COLUMNS = [
     'csv_name': 'name'
   },
   {
-    'name': 'Alternate Names',
+    'name': 'Alternate Name',
     'datatype': 'text',
-    'csv_name': 'alternate_names'
+    'csv_name': 'alternate_name'
   },
   {
-    'name': 'Former Names',
+    'name': 'Identifier',
     'datatype': 'text',
-    'csv_name': 'former_names'
-  },
-  {
-    'name': 'Identifiers',
-    'datatype': 'text',
-    'csv_name': 'identifiers'
+    'csv_name': 'identifier'
   },
   {
     'name': 'Classification',
@@ -97,69 +92,74 @@ COMMITTEE_COLUMNS = [
     'csv_name': 'classification'
   },
   {
-    'name': 'Parent Organization (name)',
-    'datatype': 'text',
-    'csv_name': 'parent_organization__name'
-  },
-  {
-    'name': 'Parent Organization (id)',
-    'datatype': 'text',
-    'csv_name': 'parent_organization__id'
-  },
-  {
     'name': 'Geographic Area',
     'datatype': 'text',
     'csv_name': 'geographic_area'
   },
   {
-    'name': 'Description (one line)',
+    'name': 'Street 1',
     'datatype': 'text',
-    'csv_name': 'description_short'
+    'csv_name': 'contact__street_1'
   },
   {
-    'name': 'Description (full)',
+    'name': 'Street 2',
     'datatype': 'text',
-    'csv_name': 'description_full'
+    'csv_name': 'contact__street_2'
   },
   {
-    'name': 'Date of Founding',
+    'name': 'City',
+    'datatype': 'text',
+    'csv_name': 'contact__city'
+  },
+  {
+    'name': 'State',
+    'datatype': 'text',
+    'csv_name': 'contact__state'
+  },
+  {
+    'name': 'Officers',
+    'datatype': 'text',
+    'csv_name': 'officers'
+  },
+  {
+    'name': 'Status 1 - Start',
     'datatype': 'calendar_date',
-    'csv_name': 'date_founding'
+    'csv_name': 'status_1__start'
   },
   {
-    'name': 'Date of Dissolution',
+    'name': 'Status 1 - End',
     'datatype': 'calendar_date',
-    'csv_name': 'date_dissolution'
+    'csv_name': 'status_1__end'
   },
   {
-    'name': 'Image (url)',
+    'name': 'Status 1 - Note',
     'datatype': 'text',
-    'csv_name': 'image_url'
+    'csv_name': 'status_1__note'
   },
   {
-    'name': 'Contact Address',
+    'name': 'Status 1 - Classification',
     'datatype': 'text',
-    'csv_name': 'address__raw'
+    'csv_name': 'status_1__classification'
   },
   {
-    'name': 'Contact Address (location)',
+    'name': 'Committee Types',
     'datatype': 'text',
-    'csv_name': 'address__location'
+    'csv_name': 'committee_types'
   },
   {
-    'name': 'External link',
+    'name': 'Candidacy Designations',
     'datatype': 'text',
-    'csv_name': 'external_link'
+    'csv_name': 'candidacy_designations'
   },
   {
-    'name': 'Candidacy ID',
+    'name': 'Notes',
     'datatype': 'text',
-    'csv_name': 'candidacy_id'
+    'csv_name': 'notes'
   },
   {
-    'name': 'Committee Type ID',
+    'name': 'Filing Year',
     'datatype': 'text',
-    'csv_name': 'committee_type_id'
+    'csv_name': 'filing_year'
   }
 ]
 
@@ -174,25 +174,23 @@ class Committee(ocd_base.Organization):
       self,
       row_id='',
       name='',
-      alternate_names=[],
-      former_names=[],
-      identifiers=[],
+      alternate_name='',
+      identifier='',
       classification='',
-      parent_organization__name='',
-      parent_organization__id='',
       geographic_area='',
-      description_short='',
-      description_full='',
-      date_founding='',
-      date_dissolution='',
-      image_url='',
-      address__raw='',
-      address__location='',
-      external_link='',
+      contact__street_1='',
+      contact__street_2='',
+      contact__city='',
+      contact__state='',
+      officers=[],
+      status_1__start='',
+      status_1__end='',
+      status_1__classification='',
+      status_1__note='',
+      committee_types=[],
       candidacy_designations=[],
-      ballot_measure_options_supported=[],
-      statuses=[],
-      committee_type_id='',
+      notes='',
+      filing_year='',
       csv_header=COMMITTEE_CSV_HEADER):
 
     super(ocd_base.Organization, self).__init__()
@@ -202,23 +200,21 @@ class Committee(ocd_base.Organization):
     self.props.update({
       'id': row_id,
       'name': name,
-      'alternate_names': alternate_names,
-      'former_names': former_names,
-      'identifiers': identifiers,
+      'alternate_name': alternate_name,
+      'identifier': identifier,
       'classification': classification,
-      'parent_organization__name': parent_organization__name,
-      'parent_organization__id': parent_organization__id,
       'geographic_area': geographic_area,
-      'description_short': description_short,
-      'description_full': description_full,
-      'date_founding': date_founding,
-      'date_dissolution': date_dissolution,
-      'image_url': image_url,
-      'address__raw': address__raw,
-      'address__location': address__location,
-      'external_link': external_link,
+      'contact__street_1': contact__street_1,
+      'contact__street_2': contact__street_2,
+      'contact__city': contact__city,
+      'contact__state': contact__state,
+      'officers': officers,
+      'status_1__start': status_1__start,
+      'status_1__end': status_1__end,
+      'status_1__classification': status_1__classification,
+      'status_1__note': status_1__note,
+      'committee_types': committee_types,
       'candidacy_designations': candidacy_designations,
-      'ballot_measure_options_supported': ballot_measure_options_supported,
-      'statuses': statuses,
-      'committee_type_id': committee_type_id
+      'notes': notes,
+      'filing_year': filing_year
     })

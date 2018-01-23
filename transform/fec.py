@@ -8,7 +8,7 @@ from csv import DictReader, DictWriter
 from datetime import datetime
 from decimal import *
 from deduplication import deduper
-from ocd import transaction
+from ocd import committee, transaction
 from settings import fec_identifiers
 from settings import settings
 from utilities import utils
@@ -39,27 +39,78 @@ def load_committee_metadata(year):
       committee_types.append(fec_identifiers.COMMITTEE_DESIGNATIONS[row['CMTE_DSGN'].upper()])
       committee_types.append(fec_identifiers.COMMITTEE_TYPES[row['CMTE_TP'].upper()])
       committee_types.append(row['CMTE_PTY_AFFILIATION'].upper())
-      committee_types.append(fec_identifiers.COMMITTEE_PARTIES[row['CMTE_PTY_AFFILIATION'].upper()])
 
-      committees[row['CMTE_ID']] = {
-        'name': row['CMTE_NM'],
-        'state': row['CMTE_ST'],
-        'officers': [{
+      committees[row['CMTE_ID']] = committee.Committee(
+        name=row['CMTE_NM'],
+        alternate_name=fec_identifiers.COMMITTEE_PARTIES[row['CMTE_PTY_AFFILIATION'].upper()],
+        identifier=row['CMTE_ID'],
+        contact__street_1=row['CMTE_ST1'],
+        contact__street_2=row['CMTE_ST2'],
+        contact__city=row['CMTE_CITY'],
+        contact__state=row['CMTE_ST'],
+        geographic_area=row['CMTE_ST'],
+        officers=[{
           'person': row['TRES_NM'],
           'title': fec_identifiers.TREASURER
         }],
-        'statuses': [{
+        statuses=[{
           'start_date': '01/01/%d' % (int(year) - 1),
           'end_date': '12/31/%s' % year,
           'note': 'Filed for this cycle',
           'classification': fec_identifiers.BASIC_FILING_STATUS
         }],
-        'committee_types': committee_types,
-        'candidacy_designations': ['%s%s' % (fec_identifiers.FEC_PREFIX, row['CAND_ID'])]
-        'notes': 'Connected organization: %s' % row['CONNECTED_ORG_NM']
-      }
+        committee_types=committee_types,
+        candidacy_designations=['%s%s' % (fec_identifiers.FEC_PREFIX, row['CAND_ID'])],
+        notes='Connected organization: %s' % row['CONNECTED_ORG_NM'],
+        filing_year=year
+      )
 
   return committees
+
+def write_committee_data(committees, year):
+  file_handles = {}
+  committee_dir = 'committees'
+  committees = load_committee_metadata(year)
+
+  for committee_id, committee in committees.keys():
+    relevant_state = committee.props['contact__state']
+
+    if relevant_state.find('/') != -1:
+      logger.warning('Odd, found slash in state for %s' % committee)
+      relevant_state = relevant_state.replace('/', '')
+    if relevant_state not in settings.STATES_IMPLEMENTED:
+      continue
+
+    path = os.path.join(settings.OCD_DIRECTORY, committee_dir, '%s.csv' % relevant_state)
+
+    if path not in file_handles:
+      try:
+        os.makedirs(settings.OCD_DIRECTORY)
+      except OSError as exception:
+        if exception.errno != errno.EEXIST:
+          raise
+
+      try:
+        os.makedirs(os.path.join(settings.OCD_DIRECTORY, committee_dir))
+      except OSError as exception:
+        if exception.errno != errno.EEXIST:
+          raise
+
+      if not os.path.exists(path):
+        logger.info('Creating path: %s' % path)
+        with open(path, 'w+') as fh:
+          writer = DictWriter(fh, output_header[data_type])
+          writer.writeheader()
+          fh.close()
+
+      file_handles[path] = open(path, 'a')
+
+    file_handles[path].write(ocd_row.to_csv_row())
+
+  counter += 1
+  if counter % 1000000 == 0:
+    logger.info('Processed %s' % locale.format('%d', counter, grouping=True))
+  logger.info('Finished processing with %s' % locale.format('%d', counter, grouping=True))
 
 def transform_contribution(row, committees, alert_filters):
   in_kind_codes = ['15Z', '24Z']
@@ -91,8 +142,8 @@ def transform_contribution(row, committees, alert_filters):
         ] if e]),
       recipient__entity_type='o',
       recipient__organization__entity_id=row['CMTE_ID'],
-      recipient__organization__name=committees[row['CMTE_ID']]['name'],
-      recipient__organization__state=committees[row['CMTE_ID']]['state'],
+      recipient__organization__name=committees[row['CMTE_ID']].props['name'],
+      recipient__organization__state=committees[row['CMTE_ID']].props['contact__state'],
       sources__url='http://docquery.fec.gov/cgi-bin/fecimg/?%s' % row['IMAGE_NUM'],
       filing__recipient='FEC',
       date=receipt_date.strftime(settings.OCD_DATETIME_FMT),
@@ -105,7 +156,7 @@ def transform_contribution(row, committees, alert_filters):
     return ({}, error, [])
 
   # Handle contributions to a particular state, and from within that state
-  relevant_states = set([committees[row['CMTE_ID']]['state'], row['STATE']])
+  relevant_states = set([committees[row['CMTE_ID']].props['contact__state'], row['STATE']])
   return (ocd_row, None, relevant_states)
 
 def transform_transaction_data(file_path, data_type, year):

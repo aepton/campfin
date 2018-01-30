@@ -77,7 +77,7 @@ def write_committee_data(year):
   committee_dir = 'committees'
   committees = load_committee_metadata(year)
 
-  for committee_id, committee in committees.keys():
+  for committee_id, committee in committees.items():
     relevant_state = committee.props['contact__state']
 
     if relevant_state.find('/') != -1:

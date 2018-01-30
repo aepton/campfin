@@ -111,6 +111,7 @@ def write_committee_data(year):
 
       file_handles[path] = open(path, 'a')
 
+    logger.info(dir(cmte))
     file_handles[path].write(cmte.to_csv_row())
 
   counter += 1

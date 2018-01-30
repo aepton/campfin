@@ -78,11 +78,6 @@ def write_committee_data(year):
   committee_dir = 'committees'
   committees = load_committee_metadata(year)
 
-  test = committee.Committee()
-  logger.info(dir(test))
-  logger.info(test.props)
-  logger.info(test.csv_header)
-
   for committee_id, cmte in committees.items():
     relevant_state = cmte.props['contact__state']
 
@@ -118,11 +113,6 @@ def write_committee_data(year):
 
     logger.info(dir(cmte))
     file_handles[path].write(cmte.to_csv_row())
-
-  counter += 1
-  if counter % 1000000 == 0:
-    logger.info('Processed %s' % locale.format('%d', counter, grouping=True))
-  logger.info('Finished processing with %s' % locale.format('%d', counter, grouping=True))
 
 def transform_contribution(row, committees, alert_filters):
   in_kind_codes = ['15Z', '24Z']

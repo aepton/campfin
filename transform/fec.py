@@ -42,7 +42,8 @@ def load_committee_metadata(year):
 
       committees[row['CMTE_ID']] = committee.Committee(
         name=row['CMTE_NM'],
-        alternate_name=fec_identifiers.COMMITTEE_PARTIES[row['CMTE_PTY_AFFILIATION'].upper()],
+        alternate_name=fec_identifiers.COMMITTEE_PARTIES.get(
+          row['CMTE_PTY_AFFILIATION'].upper(), ''),
         identifier=row['CMTE_ID'],
         contact__street_1=row['CMTE_ST1'],
         contact__street_2=row['CMTE_ST2'],

@@ -110,7 +110,7 @@ def write_committee_data(year):
 
       file_handles[path] = open(path, 'a')
 
-    file_handles[path].write(ocd_row.to_csv_row())
+    file_handles[path].write(cmte.to_csv_row())
 
   counter += 1
   if counter % 1000000 == 0:

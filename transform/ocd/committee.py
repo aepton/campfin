@@ -117,6 +117,11 @@ COMMITTEE_COLUMNS = [
     'csv_name': 'contact__state'
   },
   {
+    'name': 'Country',
+    'datatype': 'text',
+    'csv_name': 'contact__country'
+  },
+  {
     'name': 'Officers',
     'datatype': 'text',
     'csv_name': 'officers'
@@ -182,6 +187,7 @@ class Committee(ocd_base.Organization):
       contact__street_2='',
       contact__city='',
       contact__state='',
+      contact__country='',
       officers=[],
       statuses=[],
       committee_types=[],
@@ -205,6 +211,7 @@ class Committee(ocd_base.Organization):
       'contact__street_2': contact__street_2,
       'contact__city': contact__city,
       'contact__state': contact__state,
+      'contact__country': contact__country,
       'officers': officers,
       'statuses': statuses,
       'committee_types': committee_types,
@@ -212,3 +219,22 @@ class Committee(ocd_base.Organization):
       'notes': notes,
       'filing_year': filing_year
     })
+
+  def to_csv_row(self):
+    row_output = StringIO()
+    writer = DictWriter(row_output, self.csv_header)
+    props = self.props
+
+    if len(props['statuses']):
+      props['status_1__start'] = props['statuses'][0]['start_date']
+      props['status_1__end'] = props['statuses'][0]['end_date']
+      props['status_1__note'] = props['statuses'][0]['note']
+      props['status_1__classification'] = props['statuses'][0]['classification']
+      del props['statuses']
+
+    if len(props['officers']):
+      props['officers'] = '; '.join(
+        ['%s (%s)' % (o['person'], o['title']) for o in props['officers']])
+
+    writer.writerow(props)
+    return row_output.getvalue()

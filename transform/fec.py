@@ -53,6 +53,7 @@ def load_committee_metadata(year):
         contact__street_2=row['CMTE_ST2'],
         contact__city=row['CMTE_CITY'],
         contact__state=row['CMTE_ST'],
+        contact__country='USA',
         geographic_area=row['CMTE_ST'],
         officers=[{
           'person': row['TRES_NM'],
@@ -104,7 +105,7 @@ def write_committee_data(year):
       if not os.path.exists(path):
         logger.info('Creating path: %s' % path)
         with open(path, 'w+') as fh:
-          writer = DictWriter(fh, committee.COMMITTEE_CSV_HEADER)
+          writer = DictWriter(fh, cmte.csv_header)
           writer.writeheader()
           fh.close()
 

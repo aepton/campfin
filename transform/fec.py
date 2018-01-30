@@ -77,11 +77,11 @@ def write_committee_data(year):
   committee_dir = 'committees'
   committees = load_committee_metadata(year)
 
-  for committee_id, committee in committees.items():
-    relevant_state = committee.props['contact__state']
+  for committee_id, cmte in committees.items():
+    relevant_state = cmte.props['contact__state']
 
     if relevant_state.find('/') != -1:
-      logger.warning('Odd, found slash in state for %s' % committee)
+      logger.warning('Odd, found slash in state for %s' % cmte)
       relevant_state = relevant_state.replace('/', '')
     if relevant_state not in settings.STATES_IMPLEMENTED:
       continue

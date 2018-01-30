@@ -236,5 +236,9 @@ class Committee(ocd_base.Organization):
       props['officers'] = '; '.join(
         ['%s (%s)' % (o['person'], o['title']) for o in props['officers']])
 
+    props['committee_types'] = '; '.join(props['committee_types'])
+
+    props['candidacy_designations'] = '; '.join(props['candidacy_designations'])
+
     writer.writerow(props)
     return row_output.getvalue()

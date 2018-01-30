@@ -66,8 +66,10 @@ def load_committee_metadata(year):
           'classification': fec_identifiers.BASIC_FILING_STATUS
         }],
         committee_types=committee_types,
-        candidacy_designations=['%s%s' % (fec_identifiers.FEC_PREFIX, row['CAND_ID'])],
-        notes='Connected organization: %s' % row['CONNECTED_ORG_NM'],
+        candidacy_designations=[
+          '%s%s' % (fec_identifiers.FEC_PREFIX, row['CAND_ID'])] if row['CAND_ID'] else [],
+        notes='Connected organization: %s' % row[
+          'CONNECTED_ORG_NM'] if row['CONNECTED_ORG_NM'] else None,
         filing_year=year
       )
 
@@ -111,7 +113,6 @@ def write_committee_data(year):
 
       file_handles[path] = open(path, 'a')
 
-    logger.info(dir(cmte))
     file_handles[path].write(cmte.to_csv_row())
 
 def transform_contribution(row, committees, alert_filters):

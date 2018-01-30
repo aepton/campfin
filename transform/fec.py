@@ -72,7 +72,7 @@ def load_committee_metadata(year):
 
   return committees
 
-def write_committee_data(committees, year):
+def write_committee_data(year):
   file_handles = {}
   committee_dir = 'committees'
   committees = load_committee_metadata(year)

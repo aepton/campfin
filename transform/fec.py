@@ -36,7 +36,11 @@ def load_committee_metadata(year):
     reader = DictReader(fh, header, delimiter='|')
     for row in reader:
       committee_types = []
-      committee_types.append(fec_identifiers.COMMITTEE_DESIGNATIONS[row['CMTE_DSGN'].upper()])
+
+      designation = fec_identifiers.COMMITTEE_DESIGNATIONS.get(row['CMTE_DSGN'].upper(), None)
+      if designation:
+        committee_types.append(designation)
+
       committee_types.append(fec_identifiers.COMMITTEE_TYPES[row['CMTE_TP'].upper()])
       committee_types.append(row['CMTE_PTY_AFFILIATION'].upper())
 

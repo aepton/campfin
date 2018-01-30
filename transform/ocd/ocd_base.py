@@ -18,7 +18,6 @@ class OCD(object):
     self.props = {}
 
   def to_csv_row(self):
-    logger.info('nope')
     row_output = StringIO()
     writer = DictWriter(row_output, self.csv_header)
     writer.writerow(self.props)

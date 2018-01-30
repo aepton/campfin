@@ -78,6 +78,11 @@ def write_committee_data(year):
   committee_dir = 'committees'
   committees = load_committee_metadata(year)
 
+  test = committee.Committee()
+  logger.info(dir(test))
+  logger.info(test.props)
+  logger.info(test.csv_header)
+
   for committee_id, cmte in committees.items():
     relevant_state = cmte.props['contact__state']
 
@@ -105,7 +110,7 @@ def write_committee_data(year):
       if not os.path.exists(path):
         logger.info('Creating path: %s' % path)
         with open(path, 'w+') as fh:
-          writer = DictWriter(fh, cmte.csv_header)
+          writer = DictWriter(fh, committee.COMMITTEE_CSV_HEADER)
           writer.writeheader()
           fh.close()
 

@@ -221,7 +221,6 @@ class Committee(ocd_base.Organization):
     })
 
   def to_csv_row(self):
-    logger.info('yep')
     row_output = StringIO()
     writer = DictWriter(row_output, self.csv_header)
     props = self.props

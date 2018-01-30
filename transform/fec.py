@@ -104,7 +104,7 @@ def write_committee_data(year):
       if not os.path.exists(path):
         logger.info('Creating path: %s' % path)
         with open(path, 'w+') as fh:
-          writer = DictWriter(fh, output_header[data_type])
+          writer = DictWriter(fh, committee.COMMITTEE_CSV_HEADER)
           writer.writeheader()
           fh.close()
 

@@ -41,8 +41,12 @@ def load_committee_metadata(year):
       if designation:
         committee_types.append(designation)
 
-      committee_types.append(fec_identifiers.COMMITTEE_TYPES[row['CMTE_TP'].upper()])
-      committee_types.append(row['CMTE_PTY_AFFILIATION'].upper())
+      committee_type = fec_identifiers.COMMITTEE_TYPES.get(row['CMTE_TP'].upper(), None)
+      if committee_type:
+        committee_types.append(committee_type)
+
+      if row['CMTE_PTY_AFFILIATION']:
+        committee_types.append(row['CMTE_PTY_AFFILIATION'].upper())
 
       committees[row['CMTE_ID']] = committee.Committee(
         name=row['CMTE_NM'],

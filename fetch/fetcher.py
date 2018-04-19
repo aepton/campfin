@@ -84,6 +84,7 @@ class Fetcher(object):
         c = pycurl.Curl()
         c.setopt(c.URL, self.download_url)
         c.setopt(c.WRITEDATA, fh)
+        c.setopt(pycurl.FOLLOWLOCATION, 1)
         c.perform()
         c.close()
 

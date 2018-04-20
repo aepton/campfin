@@ -61,7 +61,7 @@ def upload_to_socrata():
 
   for directory in settings.OUTPUT_LOCATIONS['socrata']:
     csv = os.path.join(
-      settings.OCD_DIRECTORY, settings.OUTPUT_LOCATIONS['socrata']['directory']['file'])
+      settings.OCD_DIRECTORY, settings.OUTPUT_LOCATIONS['socrata'][directory]['file'])
     logger.info(subprocess.Popen(
       "java -jar %s -c %s -f %s -h true -m replace -ph true -cf %s -i %s" % (
         datasync,

@@ -58,17 +58,25 @@ def upload_to_socrata():
   datasync = os.path.join(home, 'datasync', 'datasync-1.8.2.jar')
   config = os.path.join(home, 'code', 'campfin_admin', 'datasync_config.json')
   control = os.path.join(home, 'code', 'campfin', 'settings', 'datasync_control.json')
-  csv = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
-  dataset = 'rvjy-yeu3'
-  logger.info(subprocess.Popen(
-    "java -jar %s -c %s -f %s -h true -m replace -ph true -cf %s -i %s" % (
-      datasync, config, csv, control, dataset),
-    shell=True,
-    stdout=subprocess.PIPE).stdout.read())
 
-def upload_to_s3(path='WA.csv'):
-  local_path = os.path.join(settings.OCD_DIRECTORY, path)
-  try:
-    utils.write_to_s3(path, local_path=local_path)
-  except Exception, e:
-    logger.info('Error uploading %s: %s' % (path, e))
+  for directory in settings.OUTPUT_LOCATIONS['socrata']:
+    csv = os.path.join(
+      settings.OCD_DIRECTORY, settings.OUTPUT_LOCATIONS['socrata']['directory']['file'])
+    logger.info(subprocess.Popen(
+      "java -jar %s -c %s -f %s -h true -m replace -ph true -cf %s -i %s" % (
+        datasync,
+        config,
+        csv,
+        control,
+        settings.OUTPUT_LOCATIONS['socrata']['directory']['dataset']),
+      shell=True,
+      stdout=subprocess.PIPE).stdout.read())
+
+def upload_to_s3():
+  for directory in settings.OUTPUT_LOCATIONS['s3']:
+    for path in settings.OUTPUT_LOCATIONS['s3'][directory]:
+      local_path = os.path.join(settings.OCD_DIRECTORY, directory, path)
+      try:
+        utils.write_to_s3(path, local_path=local_path)
+      except Exception, e:
+        logger.info('Error uploading %s: %s' % (path, e))

@@ -68,7 +68,7 @@ def upload_to_socrata():
         config,
         csv,
         control,
-        settings.OUTPUT_LOCATIONS['socrata']['directory']['dataset']),
+        settings.OUTPUT_LOCATIONS['socrata'][directory]['dataset']),
       shell=True,
       stdout=subprocess.PIPE).stdout.read())
 

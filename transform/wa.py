@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 jurisdiction = 'WA'
 
-def transform_contribution(row):
+def transform_contribution(row, alert_filters):
   try:
     row_id = '%s-%s' % (row['id'], row['origin'])
   except Exception, e:
@@ -87,7 +87,7 @@ def transform_data(file_path, data_type):
     reader = DictReader(fh)
 
     for row in reader:
-      (ocd_row, error, relevant_states) = transform_row[data_type](row)
+      (ocd_row, error, relevant_states) = transform_row[data_type](row, alert_filters)
       if error:
         if error not in missing_rows:
           missing_rows[error] = 0

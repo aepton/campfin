@@ -19,16 +19,16 @@ def orchestrate():
   logger.info('Beginning a new run')
 
   logger.info('Starting cleanup')
-  # utils.cleanup_data_dirs()
+  utils.cleanup_data_dirs()
 
   logger.info('Starting FEC')
-  # utils.download_and_process_fec_data()
+  utils.download_and_process_fec_data()
 
   logger.info('Starting WA')
-  # utils.download_and_process_wa_data()
+  utils.download_and_process_wa_data()
 
   logger.info('Starting upload')
-  # utils.upload_to_s3()
+  utils.upload_to_s3()
   utils.upload_to_socrata()
 
   logger.info('Starting alerts processing')

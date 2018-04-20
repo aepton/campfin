@@ -26,9 +26,9 @@ EMAIL_FROM_ADDRESS = 'abraham.epton@gmail.com'
 STATES_IMPLEMENTED = ['FEC', 'WA']
 YEAR_IMPLEMENTED_BEGIN = 2004
 YEAR_IMPLEMENTED_END = date.today().year if date.today().year % 2 == 0 else date.today().year + 1
-# YEARS_IMPLEMENTED = [
-#  str(year) for year in range(YEAR_IMPLEMENTED_BEGIN, YEAR_IMPLEMENTED_END + 1, 2)]
-YEARS_IMPLEMENTED = ['2018']
+YEARS_IMPLEMENTED = [
+ str(year) for year in range(YEAR_IMPLEMENTED_BEGIN, YEAR_IMPLEMENTED_END + 1, 2)]
+
 
 DATA_URLS = {}
 for year in YEARS_IMPLEMENTED:

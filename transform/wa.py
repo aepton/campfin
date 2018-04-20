@@ -94,7 +94,7 @@ def transform_data(file_path, data_type):
         missing_rows[error] += 1
         continue
 
-      path = os.path.join(settings.OCD_DIRECTORY, 'WA.csv')
+      path = os.path.join(settings.OCD_DIRECTORY, data_type, 'WA.csv')
 
       if path not in file_handles:
         try:
